@@ -1,51 +1,30 @@
 "use client";
 
 import type React from "react";
-
+import type { SessionWhatsapp } from "@/interfaces/session";
+import type { UserData } from "@/interfaces/user";
 import { useState, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Toaster } from "@/components/ui/sonner";
-import {
-  Upload,
-  MessageCircle,
-  Users,
-  Send,
-  RefreshCw,
-  Plus,
-} from "lucide-react";
-import { WhatsAppSidebar } from "../../components/whatsapp-sidebar";
-import Image from "next/image";
+import { Upload, MessageCircle, Users, Send, RefreshCw, Plus } from "lucide-react";
+import { WhatsAppSidebar } from "@/components/whatsapp-sidebar";
 import { useUser } from "@/contexts/userContext";
 
-interface UserData {
-  id: string;
-  email: string;
-  createdAt: string;
-}
 
 export default function Dashboard() {
-  const [qrCode, setQrCode] = useState("");
-  const [instanceId, setInstanceId] = useState("64B95B224CAEI");
-  const [isConnecting, setIsConnecting] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sessions, setSessions] = useState<SessionWhatsapp[]>([]);
   const { user } = useUser();
 
   useEffect(() => {
-    // Recuperar dados do usuário logado
     const fetchUserData = async () => {
       try {
         const response = await fetch("/api/auth/me");
@@ -62,19 +41,6 @@ export default function Dashboard() {
 
     fetchUserData();
   }, []);
-
-  const generateQRCode = async () => {
-    setIsConnecting(true);
-    setTimeout(() => {
-      setQrCode("/placeholder.svg?height=150&width=150&text=QR+Code");
-      setIsConnecting(false);
-    }, 2000);
-  };
-
-  const reconnectWhatsApp = () => {
-    setQrCode("");
-    generateQRCode();
-  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -106,53 +72,74 @@ export default function Dashboard() {
               <h1 className="text-xl font-semibold">
                 Olá {userData?.email || user?.name || "Usuário"}!
               </h1>
-              {/* <div className="flex items-center gap-2">
+
+              <div className="flex items-center gap-2">
+                <Button className="flex items-center gap-2 cursor-pointer bg-green-600 hover:bg-green-700">
+                  <span>Sessões ativas</span>
+                </Button>
                 <Button className="flex items-center gap-2 cursor-pointer bg-green-600 hover:bg-green-700">
                   <Plus className="h-4 w-4" />
-                  <span>Nova Campanha</span>
+                  <span>Nova Sessão</span>
                 </Button>
-              </div> */}
+              </div>
             </div>
           </header>
 
           <main className="container mx-auto p-4 md:p-6 flex-1 overflow-auto">
             <div className="flex flex-col gap-6">
-              {/* Cards de Estatísticas  - to do */}
-
-              {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Mensagens Enviadas</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Total de Sessões
+                    </CardTitle>
                     <MessageCircle className="h-4 w-4 text-green-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">0</div>
-                    <p className="text-xs text-muted-foreground">Este mês</p>
+                    <div className="text-2xl font-bold">{sessions.length}</div>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Contatos Ativos</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Conectadas
+                    </CardTitle>
                     <Users className="h-4 w-4 text-blue-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">0</div>
-                    <p className="text-xs text-muted-foreground">Total de contatos</p>
+                    <div className="text-2xl font-bold">
+                      {
+                        sessions.filter(
+                          (s) =>
+                            (s.connectionStatus?.status || s.status) ===
+                            "connected"
+                        ).length
+                      }
+                    </div>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Taxa de Sucesso</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Desconectadas
+                    </CardTitle>
                     <Send className="h-4 w-4 text-purple-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">0%</div>
-                    <p className="text-xs text-muted-foreground">Mensagens entregues</p>
+                    <div className="text-2xl font-bold">
+                      {
+                        sessions.filter((s) =>
+                          ["disconnected", "error", "failed"].includes(
+                            s.connectionStatus?.status || s.status
+                          )
+                        ).length
+                      }
+                    </div>
                   </CardContent>
                 </Card>
-              </div> */}
+              </div>
 
               {/* Seções Principais */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -166,68 +153,17 @@ export default function Dashboard() {
                     <CardDescription className="text-sm">
                       ID:{" "}
                       <span className="text-blue-600 font-mono">
-                        {instanceId}
+                        {sessions.map((session) => session.sessionId)}
                       </span>
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1 flex flex-col">
-                    <div className="flex-1 flex items-center justify-center bg-muted/50 rounded-lg mb-4 min-h-[200px]">
-                      {isConnecting ? (
-                        <div className="flex flex-col items-center space-y-3">
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-gray-600 rounded-full animate-bounce"></div>
-                            <div
-                              className="w-2 h-2 bg-gray-600 rounded-full animate-bounce"
-                              style={{ animationDelay: "0.1s" }}
-                            ></div>
-                            <div
-                              className="w-2 h-2 bg-gray-600 rounded-full animate-bounce"
-                              style={{ animationDelay: "0.2s" }}
-                            ></div>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            Gerando QR...
-                          </p>
-                        </div>
-                      ) : qrCode ? (
-                        <Image
-                          src={qrCode || "/placeholder.svg"}
-                          width={120}
-                          height={120}
-                          alt="QR Code"
-                          className="border rounded"
-                        />
-                      ) : (
-                        <div className="text-center">
-                          <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                          <p className="text-sm text-muted-foreground mb-3">
-                            Gerar QR Code
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      {!qrCode ? (
-                        <Button
-                          onClick={generateQRCode}
-                          className="w-full bg-green-600 hover:bg-green-700"
-                          size="sm"
-                        >
-                          Conectar
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={reconnectWhatsApp}
-                          variant="outline"
-                          className="w-full bg-transparent"
-                          size="sm"
-                        >
-                          <RefreshCw className="w-4 h-4 mr-2" />
-                          Reconectar
-                        </Button>
-                      )}
-                    </div>
+                    {/* <QRCodeDisplay
+                      sessionName={instanceId}
+                      onSessionCreated={(sessionName) => {
+                        console.log("Sessão criada:", sessionName);
+                      }}
+                    /> */}
                   </CardContent>
                 </Card>
 
