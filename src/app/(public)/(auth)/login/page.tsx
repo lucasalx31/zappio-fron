@@ -111,7 +111,7 @@ export default function LoginPage() {
                 <Label htmlFor="password">Senha</Label>
                 <div className="text-sm">
                   <Link
-                    href="/forgot-password"
+                    href="/forgot-pass"
                     className="font-medium text-[12px] text-primary-hover-dark transition duration-300 hover:text-primary-hover-light"
                   >
                     Esqueceu a senha?
