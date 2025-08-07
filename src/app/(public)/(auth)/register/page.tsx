@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator"
 import { Toaster } from "@/components/ui/sonner"
 
 export default function RegisterPage() {
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -51,7 +52,7 @@ export default function RegisterPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       })
 
       const data = await response.json()
@@ -102,6 +103,23 @@ export default function RegisterPage() {
         </div>
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="name">Nome</Label>
+              </div>
+              <div className="mt-2">
+                <Input
+                  type="text"
+                  id="name"
+                  placeholder="Digite seu nome"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+                {error && error.includes("email") && <p className="text-red-500 text-xs mt-1">{error}</p>}
+              </div>
+            </div>
             <div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="email">Email</Label>

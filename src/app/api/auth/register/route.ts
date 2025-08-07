@@ -3,7 +3,7 @@ import { createUser } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json()
+    const { name, email, password } = await request.json()
 
     if (!email || !password) {
       return NextResponse.json(
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const result = await createUser(email, password)
+    const result = await createUser(name, email, password)
 
     if (!result.success) {
       return NextResponse.json(

@@ -30,12 +30,13 @@ export async function authenticateUser(email: string, password: string) {
   }
 }
 
-export async function createUser(email: string, password: string) {
+export async function createUser(name: string, email: string, password: string) {
   try {
     const hashedPassword = await bcrypt.hash(password, 12)
     
     const user = await prisma.user.create({
       data: {
+        name,
         email,
         password: hashedPassword
       }
@@ -45,6 +46,7 @@ export async function createUser(email: string, password: string) {
       success: true, 
       user: {
         id: user.id,
+        name: user.name,
         email: user.email,
         createdAt: user.createdAt
       }
