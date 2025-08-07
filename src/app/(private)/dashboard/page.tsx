@@ -6,14 +6,30 @@ import type { UserData } from "@/interfaces/user";
 import { useState, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Toaster } from "@/components/ui/sonner";
-import { Upload, MessageCircle, Users, Send, RefreshCw, Plus } from "lucide-react";
+import {
+  Upload,
+  MessageCircle,
+  Users,
+  Send,
+  RefreshCw,
+  Plus,
+} from "lucide-react";
 import { WhatsAppSidebar } from "@/components/whatsapp-sidebar";
 import { useUser } from "@/contexts/userContext";
-
+import { QRCodeDisplay } from "@/components/QRCodeDisplay";
+import { createSession } from "@/lib/api/whatsapp/qrcode";
+import { WhatsappSessionCard } from "@/components/WhatsappSessionCard";
+import * as XLSX from "xlsx";
 
 export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null);
@@ -56,10 +72,75 @@ export default function Dashboard() {
     }
 
     setIsSending(true);
-    setTimeout(() => {
-      setIsSending(false);
+
+    try {
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rawData: any[] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+      const numeros: string[] = rawData.flat().filter(Boolean);
+
+      console.log("📋 Números lidos da planilha:", numeros);
+
+      for (const numeroOriginal of numeros) {
+        const numeroLimpo = String(numeroOriginal).replace(/\D/g, "");
+
+        const numeroFormatado =
+          numeroLimpo.length === 11
+            ? `55${numeroLimpo}`
+            : numeroLimpo.length >= 12 && numeroLimpo.length <= 13
+            ? numeroLimpo
+            : null;
+
+        if (!numeroFormatado) {
+          console.warn("⚠️ Número ignorado (inválido):", numeroOriginal);
+          continue;
+        }
+
+        const payload = {
+          numsession: "d5f23bf2-0316-423d-bf9a-f9131f54a713", // Ajustar para pegar automaticamente
+          numero: numeroFormatado,
+          mensagem: message,
+        };
+
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/enviar`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            }
+          );
+
+          const result = await response.json();
+
+          if (response.ok) {
+            console.log(`✅ Enviado para ${numeroFormatado}:`, result);
+          } else {
+            console.error(
+              `❌ Erro ao enviar para ${numeroFormatado}:`,
+              result.message
+            );
+          }
+        } catch (err) {
+          console.error(
+            `❌ Falha de rede ao enviar para ${numeroFormatado}:`,
+            err
+          );
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 30000)); // delay entre envios
+      }
+
       alert("Mensagens enviadas com sucesso!");
-    }, 3000);
+    } catch (error) {
+      console.error("❌ Erro ao processar a planilha:", error);
+      alert("Erro durante a leitura da planilha.");
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -72,16 +153,6 @@ export default function Dashboard() {
               <h1 className="text-xl font-semibold">
                 Olá {userData?.email || user?.name || "Usuário"}!
               </h1>
-
-              <div className="flex items-center gap-2">
-                <Button className="flex items-center gap-2 cursor-pointer bg-green-600 hover:bg-green-700">
-                  <span>Sessões ativas</span>
-                </Button>
-                <Button className="flex items-center gap-2 cursor-pointer bg-green-600 hover:bg-green-700">
-                  <Plus className="h-4 w-4" />
-                  <span>Nova Sessão</span>
-                </Button>
-              </div>
             </div>
           </header>
 
@@ -91,7 +162,7 @@ export default function Dashboard() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Total de Sessões
+                     Status da conexão
                     </CardTitle>
                     <MessageCircle className="h-4 w-4 text-green-600" />
                   </CardHeader>
@@ -103,7 +174,7 @@ export default function Dashboard() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Conectadas
+                      Mensagens Enviadas
                     </CardTitle>
                     <Users className="h-4 w-4 text-blue-600" />
                   </CardHeader>
@@ -123,7 +194,7 @@ export default function Dashboard() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Desconectadas
+                      Números Inválidos
                     </CardTitle>
                     <Send className="h-4 w-4 text-purple-600" />
                   </CardHeader>
@@ -144,28 +215,9 @@ export default function Dashboard() {
               {/* Seções Principais */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Conectar WhatsApp */}
-                <Card className="flex flex-col">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <MessageCircle className="w-5 h-5 text-green-600" />
-                      Conectar WhatsApp
-                    </CardTitle>
-                    <CardDescription className="text-sm">
-                      ID:{" "}
-                      <span className="text-blue-600 font-mono">
-                        {sessions.map((session) => session.sessionId)}
-                      </span>
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1 flex flex-col">
-                    {/* <QRCodeDisplay
-                      sessionName={instanceId}
-                      onSessionCreated={(sessionName) => {
-                        console.log("Sessão criada:", sessionName);
-                      }}
-                    /> */}
-                  </CardContent>
-                </Card>
+                {userData?.email && (
+                  <WhatsappSessionCard sessionName={userData.email} />
+                )}
 
                 {/* Upload de Contatos */}
                 <Card className="flex flex-col">
