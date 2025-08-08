@@ -220,7 +220,7 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Conectar WhatsApp */}
                 {user?.email && (
-                  <WhatsappSessionCard sessionName={user.email} />
+                  <WhatsappSessionCard sessionName={user.email} numsession={user.id} />
                 )}
 
                 {/* Upload de Contatos */}

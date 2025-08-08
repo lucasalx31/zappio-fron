@@ -43,31 +43,36 @@ export function WhatsAppSidebar() {
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
-
-      // Fazer requisição para logout
+  
+      //encerrar sessão no backend do WhatsApp
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/encerrar`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          numsession: user?.id
+        }),
+      });
+  
       const response = await fetch("/api/auth/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
       });
-
-      if (response.ok) {
-        // Redirecionar para login após logout bem-sucedido
-        router.push("/login");
-      } else {
-        console.error("Erro ao fazer logout");
-        // Mesmo com erro, redirecionar para login
-        router.push("/login");
-      }
+  
+      // 3️⃣ Redirecionar para login
+      router.push("/login");
+  
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
-      // Em caso de erro, redirecionar para login
+      console.error("Erro ao sair:", error);
       router.push("/login");
     } finally {
       setIsLoggingOut(false);
     }
   };
+  
 
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();

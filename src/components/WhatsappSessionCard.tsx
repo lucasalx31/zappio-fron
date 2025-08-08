@@ -1,76 +1,99 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { MessageCircle } from "lucide-react";
-import io from "socket.io-client";
+import io, { Socket } from "socket.io-client";
 
 type Props = {
-  sessionName: string; // Ex: email do usuário
+  sessionName: string;   // ex: "lucas@gmail.com"
+  numsession: string;    // ex: "9f79529f-dde0-4479-9078-46fdb994e394"
 };
 
-const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3000");
-
-export function WhatsappSessionCard({ sessionName }: Props) {
+export function WhatsappSessionCard({ sessionName, numsession }: Props) {
   const [status, setStatus] = useState("Aguardando conexão...");
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3000";
+
+  const socket: Socket = useMemo(() => io(SOCKET_URL, { autoConnect: true }), [SOCKET_URL]);
 
   const conectarSessao = async () => {
+    if (!sessionName || !numsession) return;
     setIsConnecting(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SOCKET_URL}/api/sessions`, {
+      const response = await fetch(`${API_URL}/conectar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionName }),
+        body: JSON.stringify({ numsession }),
       });
-
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
       setStatus(result.message || "Comando enviado. Aguarde o QR Code.");
-    } catch (err) {
-      console.error(err);
+    } catch {
       setStatus("Erro ao iniciar sessão.");
     } finally {
       setIsConnecting(false);
     }
   };
 
+  const encerrarSessao = async () => {
+    setIsClosing(true);
+    try {
+      const res = await fetch(`${API_URL}/encerrar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ numsession }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.message ?? "Falha ao encerrar a sessão");
+      setStatus(data?.message ?? "Sessão encerrada.");
+      setQrCode(null);
+    } catch (e: any) {
+      setStatus(e?.message ?? "Erro ao encerrar sessão.");
+    } finally {
+      setIsClosing(false);
+    }
+  };
+
   useEffect(() => {
     if (!sessionName) return;
-
     socket.emit("subscribe-to-session", sessionName);
 
-    socket.on("qr-code", (data) => {
-      if (data.message.includes(sessionName)) {
+    const onQr = (data: any) => {
+      if (data?.message?.includes(sessionName)) {
         setQrCode(data.base64);
         setStatus("Escaneie o QR Code para conectar.");
       }
-    });
+    };
 
-    socket.on("status-update", (data) => {
-      if (data.session === sessionName) {
-        setStatus(data.message);
-        if (["CONNECTED", "isLogged", "chatsAvailable"].includes(data.status)) {
-          setQrCode(null);
-        }
-        if (data.status === "CLOSED") {
+    const onStatus = (data: any) => {
+      if (data?.session === sessionName) {
+        setStatus(data.message ?? "Atualizando status...");
+        if (["CONNECTED", "isLogged", "chatsAvailable", "CLOSED"].includes(data.status)) {
           setQrCode(null);
         }
       }
-    });
+    };
 
-    socket.on("init-error", (data) => {
-      if (data.message.includes(sessionName)) {
-        setStatus(`Erro: ${data.message}`);
-      }
-    });
+    const onInitError = (data: any) => {
+      if (data?.message?.includes(sessionName)) setStatus(`Erro: ${data.message}`);
+    };
+
+    socket.on("qr-code", onQr);
+    socket.on("status-update", onStatus);
+    socket.on("init-error", onInitError);
 
     return () => {
-      socket.off("qr-code");
-      socket.off("status-update");
-      socket.off("init-error");
+      socket.off("qr-code", onQr);
+      socket.off("status-update", onStatus);
+      socket.off("init-error", onInitError);
     };
-  }, [sessionName]);
+  }, [socket, sessionName]);
 
   return (
     <Card className="flex flex-col">
@@ -83,6 +106,31 @@ export function WhatsappSessionCard({ sessionName }: Props) {
 
       <CardContent className="flex-1 flex flex-col gap-4">
         <div className="text-sm mt-2">{status}</div>
+
+        <div className="flex gap-2">
+          <Button className="bg-green-600" onClick={conectarSessao} disabled={isConnecting || isClosing}>
+            {isConnecting ? "Conectando..." : "Conectar sessão"}
+          </Button>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={isConnecting || isClosing}>
+                {isClosing ? "Encerrando..." : "Encerrar sessão"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Encerrar esta sessão?</AlertDialogTitle>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={encerrarSessao}>
+                  Confirmar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
 
         {qrCode && (
           <img
