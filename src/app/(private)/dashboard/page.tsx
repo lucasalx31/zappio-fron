@@ -35,28 +35,9 @@ export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [sessions, setSessions] = useState<SessionWhatsapp[]>([]);
   const { user } = useUser();
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch("/api/auth/me");
-        if (response.ok) {
-          const data = await response.json();
-          setUserData(data.user);
-        }
-      } catch (error) {
-        console.error("Erro ao buscar dados do usuário:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, []);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -99,7 +80,7 @@ export default function Dashboard() {
         }
 
         const payload = {
-          numsession: "d5f23bf2-0316-423d-bf9a-f9131f54a713", // Ajustar para pegar automaticamente
+          numsession: user?.id, // Ajustar para pegar automaticamente
           numero: numeroFormatado,
           mensagem: message,
         };
@@ -151,7 +132,7 @@ export default function Dashboard() {
           <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-14 items-center justify-between px-4 md:px-6">
               <h1 className="text-xl font-semibold">
-                Olá {userData?.email || user?.name || "Usuário"}!
+               {user ? `Olá, ${user.name}!` : "Carregando..."}
               </h1>
             </div>
           </header>
@@ -215,8 +196,8 @@ export default function Dashboard() {
               {/* Seções Principais */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Conectar WhatsApp */}
-                {userData?.email && (
-                  <WhatsappSessionCard sessionName={userData.email} />
+                {user?.email && (
+                  <WhatsappSessionCard sessionName={user.email} />
                 )}
 
                 {/* Upload de Contatos */}
