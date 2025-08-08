@@ -25,13 +25,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const res = await fetch("/api/user", {
+        const res = await fetch("/api/auth/me", {
           credentials: "include",
         })
 
         if (res.ok) {
           const data = await res.json()
-          setUser(data)
+          console.log("🧠 Dados recebidos de /api/auth/me:", data)
+          setUser(data) // 👈 data já é o usuário completo
+        } else {
+          console.warn("Resposta não OK em /api/auth/me")
         }
       } catch (err) {
         console.error("Erro ao carregar usuário:", err)
@@ -42,11 +45,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     loadUser()
   }, [])
-  return {
-    user,
-    loading,
-    children
-  }
+
+  return (
+    <UserContext.Provider value={{ user, loading }}>
+      {children}
+    </UserContext.Provider>
+  )
 }
 
 export const useUser = () => useContext(UserContext)

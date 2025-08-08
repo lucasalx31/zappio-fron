@@ -8,13 +8,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = cookies()
-    const token = (await cookieStore).get('auth-token')
+    const token = cookieStore.get('auth-token')
 
     if (!token) {
-      return NextResponse.json(
-        { error: 'Token não encontrado' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Token não encontrado' }, { status: 401 })
     }
 
     const decoded = verify(token.value, JWT_SECRET) as any
@@ -23,25 +20,19 @@ export async function GET(request: NextRequest) {
       where: { id: decoded.userId },
       select: {
         id: true,
+        name: true,
         email: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     })
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'Usuário não encontrado' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 401 })
     }
 
-    return NextResponse.json({ user })
-
+    return NextResponse.json(user)
   } catch (error) {
     console.error('Auth check error:', error)
-    return NextResponse.json(
-      { error: 'Token inválido' },
-      { status: 401 }
-    )
+    return NextResponse.json({ error: 'Token inválido' }, { status: 401 })
   }
-} 
+}
