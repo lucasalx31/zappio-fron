@@ -38,13 +38,36 @@ export default function Dashboard() {
   const [sessions, setSessions] = useState<SessionWhatsapp[]>([]);
   const { user } = useUser();
 
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
     }
   };
+
+  useEffect(() => {
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault(); 
+    };
+  
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault();
+  
+      const file = e.dataTransfer?.files?.[0];
+      if (file) {
+        setFile(file); 
+      }
+    };
+  
+    window.addEventListener("dragover", handleDragOver);
+    window.addEventListener("drop", handleDrop);
+  
+    return () => {
+      window.removeEventListener("dragover", handleDragOver);
+      window.removeEventListener("drop", handleDrop);
+    };
+  }, []);
+  
 
   const sendMessages = async () => {
     if (!file || !message.trim()) {
@@ -132,7 +155,7 @@ export default function Dashboard() {
           <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-14 items-center justify-between px-4 md:px-6">
               <h1 className="text-xl font-semibold">
-               {user ? `Olá, ${user.name}!` : "Carregando..."}
+                {user ? `Olá, ${user.name}!` : "Carregando..."}
               </h1>
             </div>
           </header>
@@ -143,7 +166,7 @@ export default function Dashboard() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                     Status da conexão
+                      Status da conexão
                     </CardTitle>
                     <MessageCircle className="h-4 w-4 text-green-600" />
                   </CardHeader>
@@ -210,8 +233,27 @@ export default function Dashboard() {
                     <CardDescription className="text-sm">
                       Upload da planilha (.xlsx, .csv)
                     </CardDescription>
+                    <div className="mt-2">
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="sm"
+                        className="text-xs"
+                      >
+                        <a href="/files/modelo-contatos-whatsapp.xlsx" download>
+                          📥 Baixar Modelo
+                        </a>
+                      </Button>
+                    </div>
                   </CardHeader>
                   <CardContent className="flex-1 flex flex-col">
+                    <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+                      <p className="text-xs text-blue-700 dark:text-blue-300">
+                        💡 <strong>Dica:</strong> Baixe o modelo para ver o
+                        formato correto dos números
+                      </p>
+                    </div>
+
                     <div className="flex-1 flex items-center justify-center">
                       <div className="w-full">
                         <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
