@@ -3,21 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Poppins } from "next/font/google";
 import { UserProvider } from "@/contexts/userContext"
+import { ThemeProvider } from "@/components/theme-provider";
 
 const poppins = Poppins({
   subsets: ["latin"], 
   weight: ["300", "400", "500", "600", "700"], 
   variable: "--font-poppins",
-});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -33,9 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-poppins">
+      <ThemeProvider>
         <UserProvider>
           {children}
         </UserProvider>
+      </ThemeProvider>
       </body>
     </html>
   );
