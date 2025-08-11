@@ -1,49 +1,49 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useTheme } from "next-themes"
-import Link from "next/link"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Toaster } from "@/components/ui/sonner"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function RegisterPage() {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [googleLoading, setGoogleLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [mounted, setMounted] = useState(false)
-  const router = useRouter()
-  const { theme } = useTheme()
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const { theme } = useTheme();
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError("")
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     if (password !== confirmPassword) {
-      setError("As senhas não coincidem")
-      setLoading(false)
-      return
+      setError("As senhas não coincidem");
+      setLoading(false);
+      return;
     }
 
     if (password.length < 6) {
-      setError("A senha deve ter pelo menos 6 caracteres")
-      setLoading(false)
-      return
+      setError("A senha deve ter pelo menos 6 caracteres");
+      setLoading(false);
+      return;
     }
 
     try {
@@ -53,35 +53,36 @@ export default function RegisterPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name, email, password }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Erro ao criar conta")
-        return
+        setError(data.error || "Erro ao criar conta");
+        return;
       }
 
       // Redirecionar para login após registro bem-sucedido
-      router.push("/login?message=Conta criada com sucesso!")
+      router.push("/login?message=Conta criada com sucesso!");
     } catch (error) {
-      setError("Erro de conexão")
+      setError("Erro de conexão");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleGoogleRegister = async () => {
-    setGoogleLoading(true)
+    setGoogleLoading(true);
     // Implementar registro com Google aqui
     setTimeout(() => {
-      setGoogleLoading(false)
-    }, 2000)
-  }
+      setGoogleLoading(false);
+    }, 2000);
+  };
 
-  const logoSrc = theme === "dark"
-    ? "/images/zappio-logo-dark.png"
-    : "/images/zappio-logo-light.png"
+  const logoSrc =
+    theme === "dark"
+      ? "/images/zappio-logo-dark.png"
+      : "/images/zappio-logo-light.png";
 
   return (
     <div className="min-h-screen flex flex-col px-10">
@@ -99,11 +100,13 @@ export default function RegisterPage() {
       </div>
       <div className="flex flex-col flex-1 justify-center items-center">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col items-center">
-          <h2 className="text-center text-3xl font-bold tracking-tight text-[var(--foreground)]">Crie sua conta</h2>
+          <h2 className="text-center text-3xl font-bold tracking-tight text-[var(--foreground)]">
+            Crie sua conta
+          </h2>
         </div>
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
+            <div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="name">Nome</Label>
               </div>
@@ -117,7 +120,9 @@ export default function RegisterPage() {
                   required
                   disabled={loading}
                 />
-                {error && error.includes("email") && <p className="text-red-500 text-xs mt-1">{error}</p>}
+                {error && error.includes("email") && (
+                  <p className="text-red-500 text-xs mt-1">{error}</p>
+                )}
               </div>
             </div>
             <div>
@@ -134,7 +139,9 @@ export default function RegisterPage() {
                   required
                   disabled={loading}
                 />
-                {error && error.includes("email") && <p className="text-red-500 text-xs mt-1">{error}</p>}
+                {error && error.includes("email") && (
+                  <p className="text-red-500 text-xs mt-1">{error}</p>
+                )}
               </div>
             </div>
             <div>
@@ -151,7 +158,11 @@ export default function RegisterPage() {
                   required
                   disabled={loading}
                 />
-                {error && error.includes("senha") && error.includes("6 caracteres") && <p className="text-red-500 text-xs mt-1">{error}</p>}
+                {error &&
+                  error.includes("senha") &&
+                  error.includes("6 caracteres") && (
+                    <p className="text-red-500 text-xs mt-1">{error}</p>
+                  )}
               </div>
             </div>
             <div>
@@ -168,7 +179,9 @@ export default function RegisterPage() {
                   required
                   disabled={loading}
                 />
-                {error && error.includes("coincidem") && <p className="text-red-500 text-xs mt-1">{error}</p>}
+                {error && error.includes("coincidem") && (
+                  <p className="text-red-500 text-xs mt-1">{error}</p>
+                )}
               </div>
             </div>
             <div>
@@ -176,7 +189,9 @@ export default function RegisterPage() {
                 type="submit"
                 disabled={loading}
                 className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-medium text-white shadow-xs transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer h-9 items-center ${
-                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
                 }`}
               >
                 {loading ? "Criando conta..." : "Criar conta"}
@@ -185,11 +200,17 @@ export default function RegisterPage() {
           </form>
           <div className="mt-6">
             <div className="relative">
-              <div className="absolute inset-0 flex items-center">
+              <div
+                className="absolute inset-0 flex items-center"
+                aria-hidden="true"
+              >
                 <Separator className="w-full" />
               </div>
+
               <div className="relative flex justify-center text-xs">
-                <span className="bg-white px-4 text-gray-500">Ou continue com</span>
+                <span className="relative z-10 bg-background px-3 text-muted-foreground">
+                  Ou continue com
+                </span>
               </div>
             </div>
             <div className="mt-6">
@@ -238,5 +259,5 @@ export default function RegisterPage() {
       </div>
       <Toaster richColors position="bottom-right" />
     </div>
-  )
+  );
 }
