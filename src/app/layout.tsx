@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Poppins } from "next/font/google";
-import { UserProvider } from "@/contexts/userContext"
+import { UserProvider } from "@/contexts/userContext";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const poppins = Poppins({
-  subsets: ["latin"], 
-  weight: ["300", "400", "500", "600", "700"], 
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-poppins",
 });
 
@@ -24,11 +23,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-poppins">
-      <ThemeProvider>
-        <UserProvider>
-          {children}
-        </UserProvider>
-      </ThemeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <UserProvider>{children}</UserProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

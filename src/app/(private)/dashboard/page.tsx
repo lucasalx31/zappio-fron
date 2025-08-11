@@ -47,27 +47,26 @@ export default function Dashboard() {
 
   useEffect(() => {
     const handleDragOver = (e: DragEvent) => {
-      e.preventDefault(); 
+      e.preventDefault();
     };
-  
+
     const handleDrop = (e: DragEvent) => {
       e.preventDefault();
-  
+
       const file = e.dataTransfer?.files?.[0];
       if (file) {
-        setFile(file); 
+        setFile(file);
       }
     };
-  
+
     window.addEventListener("dragover", handleDragOver);
     window.addEventListener("drop", handleDrop);
-  
+
     return () => {
       window.removeEventListener("dragover", handleDragOver);
       window.removeEventListener("drop", handleDrop);
     };
   }, []);
-  
 
   const sendMessages = async () => {
     if (!file || !message.trim()) {
@@ -219,9 +218,13 @@ export default function Dashboard() {
               {/* Seções Principais */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Conectar WhatsApp */}
-                {user?.email && (
-                  <WhatsappSessionCard sessionName={user.email} numsession={user.id} />
-                )}
+
+                {user?.email && user?.id ? (
+                  <WhatsappSessionCard
+                    sessionName={user.email}
+                    numsession={String(user.id)}
+                  />
+                ) : null}
 
                 {/* Upload de Contatos */}
                 <Card className="flex flex-col">
