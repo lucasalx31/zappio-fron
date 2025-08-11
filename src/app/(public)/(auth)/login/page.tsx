@@ -1,36 +1,36 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useTheme } from "next-themes"
-import Link from "next/link"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Toaster } from "@/components/ui/sonner"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [googleLoading, setGoogleLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [mounted, setMounted] = useState(false)
-  const router = useRouter()
-  const { theme } = useTheme()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const { theme } = useTheme();
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError("")
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
       const response = await fetch("/api/auth/login", {
@@ -39,53 +39,51 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Erro ao fazer login")
-        return
+        setError(data.error || "Erro ao fazer login");
+        return;
       }
 
       // Redirecionar para dashboard após login bem-sucedido
-      router.push("/dashboard")
+      router.push("/dashboard");
     } catch (error) {
-      setError("Erro de conexão")
+      setError("Erro de conexão");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleGoogleLogin = async () => {
-    setGoogleLoading(true)
+    setGoogleLoading(true);
     // Implementar login com Google aqui
     setTimeout(() => {
-      setGoogleLoading(false)
-    }, 2000)
-  }
+      setGoogleLoading(false);
+    }, 2000);
+  };
 
-  const logoSrc = theme === "dark"
-  ? "/images/zappio-logo-dark.png"
-  : "/images/zappio-logo-light.png"
+  const logoSrc =
+    theme === "dark"
+      ? "/images/zappio-logo-dark.png"
+      : "/images/zappio-logo-light.png";
 
   return (
     <div className="min-h-screen flex flex-col px-10">
       <div className="flex px-2">
         <Link href="/">
           {mounted && (
-            <Image
-              src={logoSrc}
-              width={120}
-              height={40}
-              alt="Zappio Logo"
-            />
+            <Image src={logoSrc} width={120} height={40} alt="Zappio Logo" />
           )}
         </Link>
       </div>
       <div className="flex flex-col flex-1 justify-center items-center">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col items-center">
-          <h2 className="text-center text-3xl font-bold tracking-tight text-[var(--foreground)]">Entre na sua conta</h2>
+          <h2 className="text-center text-3xl font-bold tracking-tight text-[var(--foreground)]">
+            Entre na sua conta
+          </h2>
         </div>
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -103,7 +101,9 @@ export default function LoginPage() {
                   required
                   disabled={loading}
                 />
-                {error && error.includes("email") && <p className="text-red-500 text-xs mt-1">{error}</p>}
+                {error && error.includes("email") && (
+                  <p className="text-red-500 text-xs mt-1">{error}</p>
+                )}
               </div>
             </div>
             <div>
@@ -128,7 +128,9 @@ export default function LoginPage() {
                   required
                   disabled={loading}
                 />
-                {error && !error.includes("email") && <p className="text-red-500 text-xs mt-1">{error}</p>}
+                {error && !error.includes("email") && (
+                  <p className="text-red-500 text-xs mt-1">{error}</p>
+                )}
               </div>
             </div>
             <div>
@@ -136,7 +138,9 @@ export default function LoginPage() {
                 type="submit"
                 disabled={loading}
                 className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-medium text-white shadow-xs transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer h-9 items-center ${
-                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
                 }`}
               >
                 {loading ? "Entrando..." : "Entrar"}
@@ -145,11 +149,17 @@ export default function LoginPage() {
           </form>
           <div className="mt-6">
             <div className="relative">
-              <div className="absolute inset-0 flex items-center">
+              <div
+                className="absolute inset-0 flex items-center"
+                aria-hidden="true"
+              >
                 <Separator className="w-full" />
               </div>
+
               <div className="relative flex justify-center text-xs">
-                <span className="bg-white px-4 text-gray-500">Ou continue com</span>
+                <span className="relative z-10 bg-background px-3 text-muted-foreground">
+                  Ou continue com
+                </span>
               </div>
             </div>
             <div className="mt-6">
@@ -198,5 +208,5 @@ export default function LoginPage() {
       </div>
       <Toaster richColors position="bottom-right" />
     </div>
-  )
+  );
 }
