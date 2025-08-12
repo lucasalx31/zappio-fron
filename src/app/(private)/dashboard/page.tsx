@@ -2,34 +2,19 @@
 
 import type React from "react";
 import type { SessionWhatsapp } from "@/interfaces/session";
-import type { UserData } from "@/interfaces/user";
 import { useState, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Toaster } from "@/components/ui/sonner";
-import {
-  Upload,
-  MessageCircle,
-  Users,
-  Send,
-  RefreshCw,
-  Plus,
-} from "lucide-react";
+import { Users, Send, RefreshCw } from "lucide-react";
 import { WhatsAppSidebar } from "@/components/whatsapp-sidebar";
 import { useUser } from "@/contexts/userContext";
-import { QRCodeDisplay } from "@/components/QRCodeDisplay";
-import { createSession } from "@/lib/api/whatsapp/qrcode";
 import { WhatsappSessionCard } from "@/components/WhatsappSessionCard";
 import * as XLSX from "xlsx";
+import { StatusCard } from "@/components/dashboard-cards/status-card";
+import UploadCard from "@/components/dashboard-cards/upload-card";
 
 export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null);
@@ -37,13 +22,6 @@ export default function Dashboard() {
   const [isSending, setIsSending] = useState(false);
   const [sessions, setSessions] = useState<SessionWhatsapp[]>([]);
   const { user } = useUser();
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-    }
-  };
 
   useEffect(() => {
     const handleDragOver = (e: DragEvent) => {
@@ -102,7 +80,7 @@ export default function Dashboard() {
         }
 
         const payload = {
-          numsession: user?.id, // Ajustar para pegar automaticamente
+          numsession: user?.id,
           numero: numeroFormatado,
           mensagem: message,
         };
@@ -162,18 +140,7 @@ export default function Dashboard() {
           <main className="container mx-auto p-4 md:p-6 flex-1 overflow-auto">
             <div className="flex flex-col gap-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Status da conexão
-                    </CardTitle>
-                    <MessageCircle className="h-4 w-4 text-green-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{sessions.length}</div>
-                  </CardContent>
-                </Card>
-
+                <StatusCard />
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
@@ -218,7 +185,6 @@ export default function Dashboard() {
               {/* Seções Principais */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Conectar WhatsApp */}
-
                 {user?.email && user?.id ? (
                   <WhatsappSessionCard
                     sessionName={user.email}
@@ -227,74 +193,7 @@ export default function Dashboard() {
                 ) : null}
 
                 {/* Upload de Contatos */}
-                <Card className="flex flex-col">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Users className="w-5 h-5 text-blue-600" />
-                      Lista de Contatos
-                    </CardTitle>
-                    <CardDescription className="text-sm">
-                      Upload da planilha (.xlsx, .csv)
-                    </CardDescription>
-                    <div className="mt-2">
-                      <Button
-                        asChild
-                        variant="outline"
-                        size="sm"
-                        className="text-xs"
-                      >
-                        <a href="/files/modelo-contatos-whatsapp.xlsx" download>
-                          📥 Baixar Modelo
-                        </a>
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex-1 flex flex-col">
-                    <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
-                      <p className="text-xs text-blue-700 dark:text-blue-300">
-                        💡 <strong>Dica:</strong> Baixe o modelo para ver o
-                        formato correto dos números
-                      </p>
-                    </div>
-
-                    <div className="flex-1 flex items-center justify-center">
-                      <div className="w-full">
-                        <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-                          <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                          <label
-                            htmlFor="file-upload"
-                            className="cursor-pointer"
-                          >
-                            <span className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                              Selecionar arquivo
-                            </span>
-                          </label>
-                          <Input
-                            id="file-upload"
-                            type="file"
-                            accept=".xlsx,.csv,.xls"
-                            onChange={handleFileUpload}
-                            className="hidden"
-                          />
-                          <p className="text-xs text-muted-foreground mt-1">
-                            .xlsx, .csv, .xls
-                          </p>
-                        </div>
-
-                        {file && (
-                          <div className="mt-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded p-2">
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              <span className="text-green-700 dark:text-green-300 text-sm font-medium truncate">
-                                {file.name}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <UploadCard file={file} onFileSelect={setFile} />
 
                 {/* Mensagem e Envio */}
                 <Card className="flex flex-col">
