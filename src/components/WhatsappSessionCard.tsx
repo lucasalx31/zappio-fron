@@ -18,8 +18,8 @@ export function WhatsappSessionCard({ sessionName, numsession }: Props) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-  const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3000";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL
+  const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL
 
   const socket: Socket = useMemo(() => io(SOCKET_URL, { autoConnect: true }), [SOCKET_URL]);
 
@@ -41,20 +41,20 @@ export function WhatsappSessionCard({ sessionName, numsession }: Props) {
     }
   };
 
-  const encerrarSessao = async () => {
+  const desconectarSessao = async () => {
     setIsClosing(true);
     try {
-      const res = await fetch(`${API_URL}/encerrar`, {
+      const res = await fetch(`${API_URL}/desconectar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ numsession }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data?.message ?? "Falha ao encerrar a sessão");
-      setStatus(data?.message ?? "Sessão encerrada.");
+      if (!res.ok) throw new Error(data?.message ?? "Falha ao desconectar a sessão");
+      setStatus(data?.message ?? "Sessão desconectada.");
       setQrCode(null);
     } catch (e: any) {
-      setStatus(e?.message ?? "Erro ao encerrar sessão.");
+      setStatus(e?.message ?? "Erro ao desconectar sessão.");
     } finally {
       setIsClosing(false);
     }
@@ -124,7 +124,7 @@ export function WhatsappSessionCard({ sessionName, numsession }: Props) {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={encerrarSessao}>
+                <AlertDialogAction onClick={desconectarSessao}>
                   Confirmar
                 </AlertDialogAction>
               </AlertDialogFooter>
