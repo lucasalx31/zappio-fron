@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/sonner";
+import { useUser } from "@/contexts/userContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -22,7 +23,8 @@ export default function LoginPage() {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const { theme } = useTheme();
-
+  const { fetchUser } = useUser();
+  
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -48,7 +50,7 @@ export default function LoginPage() {
         return;
       }
 
-      // Redirecionar para dashboard após login bem-sucedido
+      await fetchUser();
       router.push("/dashboard");
     } catch (error) {
       setError("Erro de conexão");
