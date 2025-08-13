@@ -6,20 +6,21 @@ import { Button } from "@/components/ui/button"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger} from "@/components/ui/alert-dialog"
 import { MessageCircle, Wifi, WifiOff, Loader2, CheckCircle, AlertCircle } from "lucide-react"
 import io, { type Socket } from "socket.io-client"
+import { type ConnectionStatus } from "@/interfaces/status-connection";
 
 type Props = {
-  sessionName: string // ex: "lucas@gmail.com"
-  numsession: string // ex: "9f79529f-dde0-4479-9078-46fdb994e394"
+  sessionName: string
+  numsession: string
+  initialStatus: ConnectionStatus; 
 }
 
-type ConnectionStatus = "disconnected" | "connecting" | "qr-ready" | "connected" | "error"
 
-export function WhatsappSessionCard({ sessionName, numsession }: Props) {
+export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: Props) {
   const [status, setStatus] = useState("Aguardando conexão...")
   const [qrCode, setQrCode] = useState<string | null>(null)
   const [isConnecting, setIsConnecting] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
-  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("disconnected")
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(initialStatus)
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL
   const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL
@@ -131,6 +132,12 @@ export function WhatsappSessionCard({ sessionName, numsession }: Props) {
       setIsClosing(false)
     }
   }
+
+  useEffect(() => {
+    if (initialStatus !== connectionStatus) {
+      setConnectionStatus(initialStatus);
+    }
+  }, [initialStatus]); 
 
   useEffect(() => {
     if (!sessionName) return

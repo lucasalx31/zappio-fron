@@ -3,15 +3,13 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap, ZapOff, QrCode, Loader2 } from 'lucide-react';
+import { type StatusData, type ConnectionStatus } from "@/interfaces/status-connection";
 
-interface StatusData {
-  service: string;
-  sessions: {
-    [key: string]: 'not_initialized' | 'connected' | 'qr_required' | 'error';
-  };
+interface StatusCardProps {
+  onStatusChange?: (data: StatusData) => void;
 }
 
-export function StatusCard() {
+export function StatusCard({ onStatusChange }: StatusCardProps) {
   const [statusData, setStatusData] = useState<StatusData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -26,6 +24,9 @@ export function StatusCard() {
         }
         const data: StatusData = await response.json();
         setStatusData(data);
+        if (onStatusChange) {
+          onStatusChange(data);
+        }
       } catch (error) {
         console.error("Erro no fetch:", error);
         setStatusData(null); 
@@ -37,7 +38,7 @@ export function StatusCard() {
     fetchStatus();
     const intervalId = setInterval(fetchStatus, 5000);
     return () => clearInterval(intervalId);
-  }, [API_URL]);
+  }, [API_URL, onStatusChange]);
 
   if (isLoading) {
     return (
@@ -55,8 +56,8 @@ export function StatusCard() {
   }
 
   const sessions = statusData?.sessions ?? {};
-  const connectedSessions = Object.values(sessions).filter(s => s === 'connected').length;
-  const qrRequiredSessions = Object.values(sessions).filter(s => s === 'qr_required').length;
+  const connectedSessions = Object.values(sessions).filter((s: ConnectionStatus) => s === 'connected').length;
+  const qrRequiredSessions = Object.values(sessions).filter((s: ConnectionStatus) => s === 'qr_required').length;
 
   let mainStatus: 'connected' | 'action_required' | 'offline' = 'offline';
   if (connectedSessions > 0) {
@@ -66,27 +67,9 @@ export function StatusCard() {
   }
 
   const statusInfo = {
-    connected: {
-      title: 'Sessão Ativa',
-      icon: <Zap className="h-4 w-4 text-green-500" />,
-      displayText: 'Conectado',
-      textColor: 'text-green-500',
-      bgColor: 'bg-green-500/10 border-green-500/20',
-    },
-    action_required: {
-      title: 'Ação Necessária',
-      icon: <QrCode className="h-4 w-4 text-yellow-500" />,
-      displayText: 'Verificar',
-      textColor: 'text-yellow-500',
-      bgColor: 'bg-yellow-500/10 border-yellow-500/20',
-    },
-    offline: {
-      title: 'Status da Conexão',
-      icon: <ZapOff className="h-4 w-4 text-red-500" />,
-      displayText: 'Desconectado',
-      textColor: 'text-red-500',
-      bgColor: 'bg-red-500/10 border-red-500/20',
-    }
+    connected: { title: 'Sessão Ativa', icon: <Zap className="h-4 w-4 text-green-500" />, displayText: 'Conectado', textColor: 'text-green-500', bgColor: 'bg-green-500/10 border-green-500/20' },
+    action_required: { title: 'Ação Necessária', icon: <QrCode className="h-4 w-4 text-yellow-500" />, displayText: 'Verificar', textColor: 'text-yellow-500', bgColor: 'bg-yellow-500/10 border-yellow-500/20' },
+    offline: { title: 'Status da Conexão', icon: <ZapOff className="h-4 w-4 text-red-500" />, displayText: 'Desconectado', textColor: 'text-red-500', bgColor: 'bg-red-500/10 border-red-500/20' }
   };
 
   const currentStatus = statusInfo[mainStatus];
