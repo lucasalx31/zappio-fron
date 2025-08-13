@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react' // 👈 Adicione useCallback
+import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 
 type User = {
   id: string
