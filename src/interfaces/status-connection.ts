@@ -1,7 +1,7 @@
 export type ConnectionStatus = 
   | "disconnected" 
   | "connecting" 
-  | "qr-ready" 
+  | "qr_required" 
   | "connected" 
   | "error" 
   | 'not_initialized';
