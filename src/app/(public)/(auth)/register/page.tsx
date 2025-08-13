@@ -79,21 +79,21 @@ export default function RegisterPage() {
     }, 2000);
   };
 
-  const logoSrc =
-    theme === "dark"
-      ? "/images/zappio-logo-dark.png"
-      : "/images/zappio-logo-light.png";
-
   return (
     <div className="min-h-screen flex flex-col px-10">
       <div className="flex px-2">
         <Link href="/">
           {mounted && (
             <Image
-              src={logoSrc || "/placeholder.svg"}
-              width={120}
-              height={40}
-              alt="Zappio Logo"
+              src={
+                theme === "dark"
+                  ? "/images/zappio-logo-dark.svg"
+                  : "/images/zappio-logo-light.svg"
+              }
+              width={100}
+              height={34}
+              className="mt-8"
+              alt="ZappiO Logo"
             />
           )}
         </Link>
