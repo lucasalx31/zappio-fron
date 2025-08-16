@@ -62,9 +62,10 @@ Backend em **Node/Express + WppConnect** e **Postgres (Supabase) + Prisma**.
 
 Create a  `.env.local` file and add your Supabase credentials:
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_WS_URL=http://localhost:3001
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=coloque_uma_chave_aleatoria_longa
-AUTH_CREDENTIALS_ENABLE=true
+NEXTAUTH_SECRET=
+DATABASE_URL= your_supa_url
+NEXTAUTH_URL=
+NEXT_PUBLIC_API_URL= back_url
+NEXT_PUBLIC_SOCKET_URL=back_url
+NEXT_PUBLIC_SUPABASE_URL= supa_project
 ```
