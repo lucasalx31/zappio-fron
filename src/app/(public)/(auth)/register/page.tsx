@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/sonner";
+import { Sun, Moon } from "lucide-react";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -23,7 +24,7 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const { theme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -80,8 +81,8 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col px-10">
-      <div className="flex px-2">
+    <div className="min-h-screen flex flex-col px-8 sm:px-10 lg:px-12">
+      <header className="flex items-center justify-between py-6">
         <Link href="/">
           {mounted && (
             <Image
@@ -92,12 +93,25 @@ export default function RegisterPage() {
               }
               width={100}
               height={34}
-              className="mt-8"
               alt="ZappiO Logo"
+              priority
             />
           )}
         </Link>
-      </div>
+
+        {mounted && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            aria-label="Alterar tema"
+            className="cursor-pointer"
+          >
+            <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          </Button>
+        )}
+      </header>
       <div className="flex flex-col flex-1 justify-center items-center">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col items-center">
           <h2 className="text-center text-3xl font-bold tracking-tight text-[var(--foreground)]">

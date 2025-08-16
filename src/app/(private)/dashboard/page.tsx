@@ -4,19 +4,17 @@ import type React from "react";
 import type { SessionWhatsapp } from "@/interfaces/session";
 import { useState, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader,CardTitle} from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Toaster } from "@/components/ui/sonner";
-import { Users, Send, RefreshCw } from "lucide-react";
+import { Users, Send } from "lucide-react";
 import { WhatsAppSidebar } from "@/components/whatsapp-sidebar";
 import { useUser } from "@/contexts/userContext";
 import { WhatsappSessionCard } from "@/components/WhatsappSessionCard";
 import * as XLSX from "xlsx";
 import { StatusCard } from "@/components/dashboard-cards/status-card";
 import UploadCard from "@/components/dashboard-cards/upload-card";
+import SendMessageCard from "@/components/dashboard-cards/send-message-card";
 import { type ConnectionStatus, type StatusData } from "@/interfaces/status-connection";
-
 
 export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null);
@@ -184,8 +182,6 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
               </div>
-
-              {/* Seções Principais */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Conectar WhatsApp */}
                 {user?.email && user?.id ? (
@@ -203,50 +199,13 @@ export default function Dashboard() {
                 <UploadCard file={file} onFileSelect={setFile} />
 
                 {/* Mensagem e Envio */}
-                <Card className="flex flex-col">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Send className="w-5 h-5 text-purple-600" />
-                      Enviar Mensagem
-                    </CardTitle>
-                    <CardDescription className="text-sm">
-                      Mensagem para todos os contatos
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1 flex flex-col">
-                    <div className="flex-1 flex flex-col">
-                      <Textarea
-                        placeholder="Digite sua mensagem aqui..."
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        className="flex-1 resize-none"
-                        rows={6}
-                      />
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {message.length} caracteres
-                      </p>
-                    </div>
-
-                    <Button
-                      onClick={sendMessages}
-                      disabled={isSending || !file || !message.trim()}
-                      className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 mt-4"
-                      size="sm"
-                    >
-                      {isSending ? (
-                        <>
-                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                          Enviando...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4 mr-2" />
-                          Enviar Mensagens
-                        </>
-                      )}
-                    </Button>
-                  </CardContent>
-                </Card>
+                <SendMessageCard
+                  message={message}
+                  onMessageChange={setMessage}
+                  onSend={sendMessages}
+                  isSending={isSending}
+                  isFileSelected={!!file}
+                />
               </div>
             </div>
           </main>
