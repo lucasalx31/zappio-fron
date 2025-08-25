@@ -3,10 +3,15 @@ import { cookies } from 'next/headers'
 
 export async function POST() {
   try {
-    const cookieStore = cookies()
-    
-    // Remover o cookie de autenticação
-    cookieStore.delete('auth-token')
+    const cookieStore = await cookies()
+
+    cookieStore.set('auth-token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 0,
+      path: '/', 
+    })
 
     return NextResponse.json({ success: true })
 
@@ -17,4 +22,4 @@ export async function POST() {
       { status: 500 }
     )
   }
-} 
+}
