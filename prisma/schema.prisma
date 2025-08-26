@@ -21,4 +21,6 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  messagesSent Int   @default(0)  
+  invalidNumbers Int @default(0) 
 }
