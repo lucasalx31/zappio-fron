@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/sonner";
 import { useUser } from "@/contexts/userContext";
 import { Sun, Moon } from "lucide-react";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -34,31 +35,37 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
-
-    try {
+  
+    const doLogin = async () => {
       const response = await fetch("/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || "Erro ao fazer login");
-        return;
-      }
-
+      if (!response.ok) throw new Error(data.error || "Credenciais inválidas");
       await fetchUser();
-      router.push("/dashboard");
-    } catch (error) {
-      setError("Erro de conexão");
+      return data;
+    };
+  
+    try {
+      const p = doLogin(); // NÃO await aqui
+      toast.promise(p, {
+        loading: "Entrando...",
+        success: "Login realizado com sucesso!",
+        error: (err) => err.message || "Erro ao fazer login",
+      });
+    
+      await p;                                   
+      await new Promise(r => setTimeout(r, 60)); 
+      router.replace("/dashboard");  
+    } catch (err: any) {
+      setError(err.message || "Erro ao fazer login");
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);

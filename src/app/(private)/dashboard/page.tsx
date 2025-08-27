@@ -15,6 +15,7 @@ import { StatusCard } from "@/components/dashboard-cards/status-card";
 import UploadCard from "@/components/dashboard-cards/upload-card";
 import SendMessageCard from "@/components/dashboard-cards/send-message-card";
 import { type ConnectionStatus, type StatusData } from "@/interfaces/status-connection";
+import { toast } from "sonner"
 
 export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null);
@@ -49,7 +50,7 @@ export default function Dashboard() {
 
   const sendMessages = async () => {
     if (!file || !message.trim()) {
-      alert("Por favor, selecione um arquivo e digite uma mensagem");
+      toast.warning("Por favor, selecione um arquivo e digite uma mensagem");
       return;
     }
 
@@ -63,7 +64,7 @@ export default function Dashboard() {
 
       const numeros: string[] = rawData.flat().filter(Boolean);
 
-      console.log("📋 Números lidos da planilha:", numeros);
+      //console.log("📋 Números lidos da planilha:", numeros);
 
       for (const numeroOriginal of numeros) {
         const numeroLimpo = String(numeroOriginal).replace(/\D/g, "");
@@ -115,11 +116,9 @@ export default function Dashboard() {
 
         await new Promise((resolve) => setTimeout(resolve, 30000)); // delay entre envios
       }
-
-      alert("Mensagens enviadas com sucesso!");
+      toast.success("Mensagens enviadas com sucesso!");
     } catch (error) {
-      console.error("❌ Erro ao processar a planilha:", error);
-      alert("Erro durante a leitura da planilha.");
+      toast.error("Erro durante a leitura da planilha.");
     } finally {
       setIsSending(false);
     }
