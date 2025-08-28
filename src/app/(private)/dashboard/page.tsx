@@ -149,14 +149,8 @@ export default function Dashboard() {
                     <Users className="h-4 w-4 text-blue-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
-                      {
-                        sessions.filter(
-                          (s) =>
-                            (s.connectionStatus?.status || s.status) ===
-                            "connected"
-                        ).length
-                      }
+                    <div className="text-xl font-bold">
+                     Em breve..
                     </div>
                   </CardContent>
                 </Card>
@@ -169,14 +163,8 @@ export default function Dashboard() {
                     <Send className="h-4 w-4 text-purple-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
-                      {
-                        sessions.filter((s) =>
-                          ["disconnected", "error", "failed"].includes(
-                            s.connectionStatus?.status || s.status
-                          )
-                        ).length
-                      }
+                    <div className="text-xl font-bold">
+                      Em breve..
                     </div>
                   </CardContent>
                 </Card>
