@@ -50,13 +50,13 @@ export default function Dashboard() {
 
   const sendMessages = async () => {
     if (!file || !message.trim()) {
-      toast.warning("Por favor, selecione um arquivo e digite uma mensagem");
+      alert("Por favor, selecione um arquivo e digite uma mensagem");
       return;
     }
 
     setIsSending(true);
 
-    try {
+    try { 
       const buffer = await file.arrayBuffer();
       const workbook = XLSX.read(buffer, { type: "array" });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -64,64 +64,60 @@ export default function Dashboard() {
 
       const numeros: string[] = rawData.flat().filter(Boolean);
 
-      //console.log("📋 Números lidos da planilha:", numeros);
+      // Monta lista de mensagens (mesma mensagem para todos)
+      const mensagens = numeros
+        .map((numeroOriginal) => {
+          const numeroLimpo = String(numeroOriginal).replace(/\D/g, "");
 
-      for (const numeroOriginal of numeros) {
-        const numeroLimpo = String(numeroOriginal).replace(/\D/g, "");
+        
+          return {
+            numero: numeroLimpo,
+            mensagem: message,
+          };
+        })
+        .filter(Boolean);
 
-        const numeroFormatado =
-          numeroLimpo.length === 11
-            ? `55${numeroLimpo}`
-            : numeroLimpo.length >= 12 && numeroLimpo.length <= 13
-            ? numeroLimpo
-            : null;
-
-        if (!numeroFormatado) {
-          console.warn("⚠️ Número ignorado (inválido):", numeroOriginal);
-          continue;
-        }
-
-        const payload = {
-          numsession: user?.id,
-          numero: numeroFormatado,
-          mensagem: message,
-        };
-
-        try {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/enviar`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            }
-          );
-
-          const result = await response.json();
-
-          if (response.ok) {
-            console.log(`✅ Enviado para ${numeroFormatado}:`, result);
-          } else {
-            console.error(
-              `❌ Erro ao enviar para ${numeroFormatado}:`,
-              result.message
-            );
-          }
-        } catch (err) {
-          console.error(
-            `❌ Falha de rede ao enviar para ${numeroFormatado}:`,
-            err
-          );
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, 30000)); // delay entre envios
+      if (mensagens.length === 0) {
+        alert("Nenhum número válido encontrado na planilha.");
+        return;
       }
-      toast.success("Mensagens enviadas com sucesso!");
+
+      const payload = {
+        numsession: user?.id,
+        mensagens,
+      };
+
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/enviar`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        const result = await response.json();
+
+        if (response.ok) {
+          //console.log(`✅ ${mensagens.length} mensagens enfileiradas:`, result);
+          toast.success(`${mensagens.length} mensagens enviadas para a fila com sucesso!`);
+        } else {
+          //console.error(`❌ Erro ao enfileirar mensagens:`, result.message);
+          toast.error(`Erro: ${result.message}`);
+        }
+        
+      } catch (err) {
+        //console.error("❌ Falha de rede ao enviar mensagens:", err);
+        toast.error("Erro de conexão com o servidor.");
+      }
     } catch (error) {
+      //console.error("❌ Erro ao processar a planilha:", error);
       toast.error("Erro durante a leitura da planilha.");
     } finally {
       setIsSending(false);
     }
+
   };
 
   return (
@@ -149,8 +145,14 @@ export default function Dashboard() {
                     <Users className="h-4 w-4 text-blue-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-xl font-bold">
-                     Em breve..
+                    <div className="text-2xl font-bold">
+                      {
+                        sessions.filter(
+                          (s) =>
+                            (s.connectionStatus?.status || s.status) ===
+                            "connected"
+                        ).length
+                      }
                     </div>
                   </CardContent>
                 </Card>
@@ -163,8 +165,14 @@ export default function Dashboard() {
                     <Send className="h-4 w-4 text-purple-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-xl font-bold">
-                      Em breve..
+                    <div className="text-2xl font-bold">
+                      {
+                        sessions.filter((s) =>
+                          ["disconnected", "error", "failed"].includes(
+                            s.connectionStatus?.status || s.status
+                          )
+                        ).length
+                      }
                     </div>
                   </CardContent>
                 </Card>
@@ -200,5 +208,5 @@ export default function Dashboard() {
       </div>
       <Toaster richColors position="bottom-right" />
     </SidebarProvider>
-  );
+);
 }
