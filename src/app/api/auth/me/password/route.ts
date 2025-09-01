@@ -8,7 +8,8 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
 export async function POST(request: NextRequest) {
   try {
-    const token = cookies().get("auth-token");
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth-token");
     if (!token) return NextResponse.json({ error: "Token não encontrado" }, { status: 401 });
 
     const { userId } = verify(token.value, JWT_SECRET) as { userId: string };
