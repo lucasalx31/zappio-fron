@@ -98,7 +98,7 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
       if (!res.ok) throw new Error(data?.message ?? "Falha ao desconectar a sessão")
       setQrCode(null)
       setConnectionStatus("disconnected")
-    } catch (e: unknown) {
+    } catch {
       setConnectionStatus("error")
     } finally {
       setIsClosing(false)
