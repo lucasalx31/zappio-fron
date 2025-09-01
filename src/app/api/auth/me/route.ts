@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
-export async function GET(_: NextRequest) {
+export async function GET() {
   try {
     const token = cookies().get("auth-token");
     if (!token) return NextResponse.json({ error: "Token não encontrado" }, { status: 401 });

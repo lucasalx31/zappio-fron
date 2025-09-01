@@ -21,7 +21,7 @@ export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [sessions, setSessions] = useState<SessionWhatsapp[]>([]);
+  const [sessions] = useState<SessionWhatsapp[]>([]);
   const [globalStatus, setGlobalStatus] = useState<StatusData | null>(null);
   const { user } = useUser();
 
@@ -60,9 +60,9 @@ export default function Dashboard() {
       const buffer = await file.arrayBuffer();
       const workbook = XLSX.read(buffer, { type: "array" });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rawData: any[] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      const rawData: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-      const numeros: string[] = rawData.flat().filter(Boolean);
+      const numeros: string[] = rawData.flat().filter(Boolean).map(String);
 
       // Monta lista de mensagens (mesma mensagem para todos)
       const mensagens = numeros
@@ -107,11 +107,11 @@ export default function Dashboard() {
           toast.error(`Erro: ${result.message}`);
         }
         
-      } catch (err) {
+      } catch (_err) {
         //console.error("❌ Falha de rede ao enviar mensagens:", err);
         toast.error("Erro de conexão com o servidor.");
       }
-    } catch (error) {
+    } catch (_error) {
       //console.error("❌ Erro ao processar a planilha:", error);
       toast.error("Erro durante a leitura da planilha.");
     } finally {

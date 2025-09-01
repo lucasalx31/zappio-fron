@@ -49,7 +49,7 @@ export default function LoginPage() {
     };
   
     try {
-      const p = doLogin(); // NÃO await aqui
+      const p = doLogin();
       toast.promise(p, {
         loading: "Entrando...",
         success: "Login realizado com sucesso!",
@@ -59,8 +59,12 @@ export default function LoginPage() {
       await p;                                   
       await new Promise(r => setTimeout(r, 60)); 
       router.replace("/dashboard");  
-    } catch (err: any) {
-      setError(err.message || "Erro ao fazer login");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Ocorreu um erro desconhecido ao fazer login");
+      }
     } finally {
       setLoading(false);
     }

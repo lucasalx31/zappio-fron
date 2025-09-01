@@ -8,15 +8,17 @@ import { MessageCircle, Wifi, WifiOff, Loader2, CheckCircle, AlertCircle } from 
 import io, { type Socket } from "socket.io-client"
 import { type ConnectionStatus } from "@/interfaces/status-connection";
 
+type QrData = { message?: string; base64: string };
+type StatusUpdateData = { session?: string; message?: string; status: string };
+type InitErrorData = { message?: string };
+
 type Props = {
   sessionName: string
   numsession: string
   initialStatus: ConnectionStatus; 
 }
 
-
 export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: Props) {
-  const [status, setStatus] = useState("Aguardando conexão...")
   const [qrCode, setQrCode] = useState<string | null>(null)
   const [isConnecting, setIsConnecting] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
@@ -35,11 +37,6 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
           color: "text-green-600",
           bgColor: "bg-green-50 dark:bg-green-950",
           borderColor: "border-green-200 dark:border-green-800",
-          badge: {
-            text: "Conectado",
-            variant: "default" as const,
-            className: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-          },
         }
       case "connecting":
         return {
@@ -47,23 +44,13 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
           color: "text-blue-600",
           bgColor: "bg-blue-50 dark:bg-blue-950",
           borderColor: "border-blue-200 dark:border-blue-800",
-          badge: {
-            text: "Conectando...",
-            variant: "secondary" as const,
-            className: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-          },
         }
-      case "qr-ready":
+      case "qr_required":
         return {
           icon: MessageCircle,
           color: "text-orange-600",
           bgColor: "bg-orange-50 dark:bg-orange-950",
           borderColor: "border-orange-200 dark:border-orange-800",
-          badge: {
-            text: "Escaneie o QR",
-            variant: "secondary" as const,
-            className: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
-          },
         }
       case "error":
         return {
@@ -71,11 +58,6 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
           color: "text-red-600",
           bgColor: "bg-red-50 dark:bg-red-950",
           borderColor: "border-red-200 dark:border-red-800",
-          badge: {
-            text: "Erro",
-            variant: "destructive" as const,
-            className: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-          },
         }
       default:
         return {
@@ -83,11 +65,6 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
           color: "text-gray-600",
           bgColor: "bg-gray-50 dark:bg-gray-950",
           borderColor: "border-gray-200 dark:border-gray-800",
-          badge: {
-            text: "Desconectado",
-            variant: "outline" as const,
-            className: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
-          },
         }
     }
   }
@@ -97,15 +74,12 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
     setIsConnecting(true)
     setConnectionStatus("connecting")
     try {
-      const response = await fetch(`${API_URL}/conectar`, {
+      await fetch(`${API_URL}/conectar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ numsession }),
       })
-      const result = await response.json().catch(() => ({}))
-      setStatus(result.message || "Aguardando QR Code...")
     } catch {
-      setStatus("Erro ao iniciar sessão.")
       setConnectionStatus("error")
     } finally {
       setIsConnecting(false)
@@ -122,11 +96,9 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data?.message ?? "Falha ao desconectar a sessão")
-      setStatus(data?.message ?? "Sessão desconectada.")
       setQrCode(null)
       setConnectionStatus("disconnected")
-    } catch (e: any) {
-      setStatus(e?.message ?? "Erro ao desconectar sessão.")
+    } catch (e: unknown) {
       setConnectionStatus("error")
     } finally {
       setIsClosing(false)
@@ -137,42 +109,35 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
     if (initialStatus !== connectionStatus) {
       setConnectionStatus(initialStatus);
     }
-  }, [initialStatus]); 
+  }, [initialStatus, connectionStatus]); 
 
   useEffect(() => {
     if (!sessionName) return
     socket.emit("subscribe-to-session", sessionName)
 
-    const onQr = (data: any) => {
+    const onQr = (data: QrData) => {
       if (data?.message?.includes(sessionName)) {
         setQrCode(data.base64)
-        setStatus("Escaneie o QR Code com seu WhatsApp")
-        setConnectionStatus("qr-ready")
+        setConnectionStatus("qr_required")
       }
     }
 
-    const onStatus = (data: any) => {
+    const onStatus = (data: StatusUpdateData) => {
       if (data?.session === sessionName) {
-        setStatus(data.message ?? "Atualizando status...")
-
         if (["CONNECTED", "isLogged", "chatsAvailable"].includes(data.status)) {
           setQrCode(null)
           setConnectionStatus("connected")
-          setStatus("WhatsApp conectado com sucesso!")
         } else if (data.status === "CLOSED") {
           setQrCode(null)
           setConnectionStatus("disconnected")
-          setStatus("Sessão encerrada")
         } else if (data.status === "INITIALIZING") {
           setConnectionStatus("connecting")
-          setStatus("Inicializando sessão...")
         }
       }
     }
 
-    const onInitError = (data: any) => {
+    const onInitError = (data: InitErrorData) => {
       if (data?.message?.includes(sessionName)) {
-        setStatus(`Erro: ${data.message}`)
         setConnectionStatus("error")
       }
     }
