@@ -25,7 +25,7 @@ export async function authenticateUser(email: string, password: string) {
         createdAt: user.createdAt
       }
     }
-  } catch (_error) {
+  } catch {
     return { success: false, error: 'Erro interno do servidor' }
   }
 }

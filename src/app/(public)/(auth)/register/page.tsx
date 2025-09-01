@@ -65,7 +65,7 @@ export default function RegisterPage() {
 
       // Redirecionar para login após registro bem-sucedido
       router.push("/login?message=Conta criada com sucesso!");
-    } catch (_error) {
+    } catch {
       setError("Erro de conexão");
     } finally {
       setLoading(false);

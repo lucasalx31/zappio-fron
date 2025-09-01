@@ -67,7 +67,7 @@ export default function SettingsPage() {
       await fetchUser();
       baseline.current = { ...profile };
       toast.success("Perfil atualizado com sucesso");
-    } catch (_e) {
+    } catch {
       toast.error("Erro ao atualizar perfil");
     } finally {
       setSavingProfile(false);
@@ -92,7 +92,7 @@ export default function SettingsPage() {
 
       setPasswords({ currentPassword: "", newPassword: "", confirmPassword: "" });
       toast.success("Senha alterada com sucesso");
-    } catch (_e) {
+    } catch {
       toast.error("Erro ao alterar senha");
     } finally {
       setSavingPassword(false);
