@@ -55,14 +55,6 @@ export function WhatsAppSidebar() {
         }),
       });
   
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-  
-      // 3️⃣ Redirecionar para login
       router.push("/login");
   
     } catch (error) {

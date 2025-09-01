@@ -2,7 +2,7 @@ import type React from "react";
 import { useRef } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Upload, X, Trash2 } from "lucide-react";
+import { Users, Upload, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface UploadCardProps {
