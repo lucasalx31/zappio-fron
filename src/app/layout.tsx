@@ -29,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-poppins">
+      <body className={poppins.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

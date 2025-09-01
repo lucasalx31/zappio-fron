@@ -5,9 +5,10 @@ import { prisma } from "@/lib/prisma";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
-export async function GET(_: NextRequest) {
+export async function GET() {
   try {
-    const token = cookies().get("auth-token");
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth-token");
     if (!token) return NextResponse.json({ error: "Token não encontrado" }, { status: 401 });
 
     const decoded = verify(token.value, JWT_SECRET) as { userId: string };
@@ -28,7 +29,8 @@ export async function GET(_: NextRequest) {
 // Atualiza APENAS nome/email
 export async function PATCH(request: NextRequest) {
   try {
-    const token = cookies().get("auth-token");
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth-token");
     if (!token) return NextResponse.json({ error: "Token não encontrado" }, { status: 401 });
 
     const { userId } = verify(token.value, JWT_SECRET) as { userId: string };
