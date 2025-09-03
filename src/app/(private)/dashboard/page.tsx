@@ -53,40 +53,45 @@ export default function Dashboard() {
       alert("Por favor, selecione um arquivo e digite uma mensagem");
       return;
     }
-
+  
     setIsSending(true);
-
-    try { 
+  
+    try {
       const buffer = await file.arrayBuffer();
       const workbook = XLSX.read(buffer, { type: "array" });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rawData: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-      const numeros: string[] = rawData.flat().filter(Boolean).map(String);
-
-      // Monta lista de mensagens (mesma mensagem para todos)
-      const mensagens = numeros
-        .map((numeroOriginal) => {
-          const numeroLimpo = String(numeroOriginal).replace(/\D/g, "");
-
-        
-          return {
-            numero: numeroLimpo,
-            mensagem: message,
-          };
+  
+      // Monta a lista de mensagens
+      const mensagens = rawData
+        .map((row: unknown[]) => {
+          const nome = String(row[0]);
+          const numeroOriginal = String(row[1]);
+          const numeroLimpo = numeroOriginal.replace(/\D/g, "");
+  
+          if (nome && numeroLimpo) {
+            return {
+              nome: nome,
+              numero: numeroLimpo,
+              mensagem: message,
+            };
+          }
+          return null;
         })
         .filter(Boolean);
-
+  
       if (mensagens.length === 0) {
-        alert("Nenhum número válido encontrado na planilha.");
+        alert("Nenhum contato válido (com nome e número) foi encontrado na planilha.");
         return;
       }
-
+  
       const payload = {
         numsession: user?.id,
         mensagens,
       };
 
+      //console.log("Enviando para o backend:", payload); 
+  
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/enviar`,
@@ -96,28 +101,23 @@ export default function Dashboard() {
             body: JSON.stringify(payload),
           }
         );
-
+  
         const result = await response.json();
-
+  
         if (response.ok) {
-          //console.log(`✅ ${mensagens.length} mensagens enfileiradas:`, result);
           toast.success(`${mensagens.length} mensagens enviadas para a fila com sucesso!`);
         } else {
-          //console.error(`❌ Erro ao enfileirar mensagens:`, result.message);
           toast.error(`Erro: ${result.message}`);
         }
-        
-      } catch{
-        //console.error("❌ Falha de rede ao enviar mensagens:", err);
+  
+      } catch (err) {
         toast.error("Erro de conexão com o servidor.");
       }
-    } catch {
-      //console.error("❌ Erro ao processar a planilha:", error);
+    } catch (error) {
       toast.error("Erro durante a leitura da planilha.");
     } finally {
       setIsSending(false);
     }
-
   };
 
   return (
