@@ -106,10 +106,8 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
   }
 
   useEffect(() => {
-    if (initialStatus !== connectionStatus) {
-      setConnectionStatus(initialStatus);
-    }
-  }, [initialStatus, connectionStatus]); 
+    setConnectionStatus(initialStatus);
+  }, [initialStatus]);
 
   useEffect(() => {
     if (!sessionName) return
