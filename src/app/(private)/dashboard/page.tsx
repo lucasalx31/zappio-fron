@@ -110,10 +110,10 @@ export default function Dashboard() {
           toast.error(`Erro: ${result.message}`);
         }
   
-      } catch (err) {
+      } catch{
         toast.error("Erro de conexão com o servidor.");
       }
-    } catch (error) {
+    } catch{
       toast.error("Erro durante a leitura da planilha.");
     } finally {
       setIsSending(false);
