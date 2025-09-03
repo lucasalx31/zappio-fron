@@ -43,23 +43,31 @@ export function WhatsAppSidebar() {
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
+
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+
   
-      //encerrar sessão no backend do WhatsApp
+      // 2. Encerrar a sessão no backend do WhatsApp (seu código original)
+      // Você pode manter esta chamada se ela for necessária para o seu fluxo.
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/encerrar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          numsession: user?.id
+          numsession: user?.id,
         }),
       });
   
+      // 3. Redirecionar para a página de login
+      // Faça isso somente DEPOIS que as chamadas de API forem concluídas.
       router.push("/login");
   
     } catch (error) {
       console.error("Erro ao sair:", error);
-      router.push("/login");
+      // Adicione um feedback visual de erro para o usuário se desejar
     } finally {
       setIsLoggingOut(false);
     }

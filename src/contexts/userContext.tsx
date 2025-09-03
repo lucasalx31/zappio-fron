@@ -33,14 +33,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (res.ok) {
         const data = await res.json()
-        console.log('🧠 Dados recebidos de /api/auth/me:', data)
+        //console.log('🧠 Dados recebidos de /api/auth/me:', data)
         setUser(data)
       } else {
-        console.warn('Resposta não OK em /api/auth/me, limpando usuário.')
+        //console.warn('Resposta não OK em /api/auth/me, limpando usuário.')
         setUser(null) 
       }
-    } catch (err) {
-      console.error('Erro ao carregar usuário:', err)
+    } catch{
+      //console.error('Erro ao carregar usuário:', err)
       setUser(null)
     } finally {
       setLoading(false)

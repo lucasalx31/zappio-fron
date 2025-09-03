@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap, ZapOff, QrCode, Loader2 } from 'lucide-react';
 import { type StatusData, type ConnectionStatus } from "@/interfaces/status-connection";
+import { useUser } from "@/contexts/userContext";
 
 interface StatusCardProps {
   onStatusChange?: (data: StatusData) => void;
@@ -12,13 +13,13 @@ interface StatusCardProps {
 export function StatusCard({ onStatusChange }: StatusCardProps) {
   const [statusData, setStatusData] = useState<StatusData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  const { user } = useUser();
   const API_URL = process.env.NEXT_PUBLIC_API_URL
 
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await fetch(`${API_URL}/status`); 
+        const response = await fetch(`${API_URL}/status/${user?.id}`); 
         if (!response.ok) {
           throw new Error(`Falha ao buscar dados de status: ${response.statusText}`);
         }
