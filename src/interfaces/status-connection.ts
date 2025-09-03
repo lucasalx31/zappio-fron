@@ -8,7 +8,7 @@ export type ConnectionStatus =
 
 export interface StatusData {
   service: string;
-  sessions: {
+  session: {
     [key: string]: ConnectionStatus;
   };
 }

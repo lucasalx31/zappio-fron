@@ -184,7 +184,7 @@ export default function Dashboard() {
                     sessionName={user.email}
                     numsession={String(user.id)}
                     initialStatus={
-                      (globalStatus?.sessions?.[user.email] ||
+                      (globalStatus?.session?.[user.email] ||
                         "disconnected") as ConnectionStatus
                     }
                   />

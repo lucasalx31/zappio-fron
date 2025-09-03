@@ -9,7 +9,7 @@ type Props = {
   onSessionCreated?: (sessionName: string) => void;
 };
 
-const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3000");
+const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL);
 
 export function QRCodeDisplay({ sessionName, onSessionCreated }: Props) {
   const [qrCode, setQrCode] = useState<string | null>(null);
