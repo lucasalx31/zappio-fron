@@ -69,6 +69,14 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
     }
   }
 
+  const encerrarSessao = async () => {
+      await fetch(`${API_URL}/encerrar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ numsession }),
+      }); 
+  };
+
   const conectarSessao = async () => {
     if (!sessionName || !numsession) return
     setIsConnecting(true)
@@ -81,6 +89,7 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
       })
     } catch {
       setConnectionStatus("error")
+      await encerrarSessao(); 
     } finally {
       setIsConnecting(false)
     }
