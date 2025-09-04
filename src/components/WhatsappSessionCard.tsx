@@ -69,22 +69,39 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
     }
   }
 
-  const conectarSessao = async () => {
-    if (!sessionName || !numsession) return
-    setIsConnecting(true)
-    setConnectionStatus("connecting")
-    try {
-      await fetch(`${API_URL}/conectar`, {
+  const encerrarSessao = async () => {
+      await fetch(`${API_URL}/encerrar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ numsession }),
-      })
-    } catch {
-      setConnectionStatus("error")
+      }); 
+  };
+
+  const conectarSessao = async () => {
+    if (!sessionName || !numsession) return;
+  
+    if (connectionStatus === "error") {
+      await encerrarSessao();
+    } 
+    setIsConnecting(true);
+    setConnectionStatus("connecting");
+    try {
+      const res = await fetch(`${API_URL}/conectar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ numsession }),
+      });
+
+      if (!res.ok) {
+        throw new Error("API retornou um erro ao conectar.");
+      }
+    } catch (error) {
+      console.error("Falha na tentativa de conexão:", error);
+      setConnectionStatus("error");
     } finally {
-      setIsConnecting(false)
+      setIsConnecting(false);
     }
-  }
+  };
 
   const desconectarSessao = async () => {
     setIsClosing(true)
