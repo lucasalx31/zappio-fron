@@ -126,7 +126,7 @@ export function WhatsAppSidebar() {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-1 px-2 h-8 text-xs"
+                className="w-full justify-start gap-1 px-2 h-8 text-xs cursor-pointer"
               >
                 <Avatar className="h-7 w-7">
                   <AvatarImage

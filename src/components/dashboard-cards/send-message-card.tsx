@@ -47,7 +47,7 @@ export default function SendMessageCard({
         <Button
           onClick={onSend} // 👈 Chama a função da prop
           disabled={isSending || !isFileSelected || !message.trim()} // 👈 Usa as props para desabilitar
-          className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 mt-4"
+          className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 mt-4 cursor-pointer"
           size="sm"
         >
           {isSending ? (
