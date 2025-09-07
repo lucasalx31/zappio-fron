@@ -20,7 +20,6 @@ import { toast } from "sonner"
 export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
-  const [isSending, setIsSending] = useState(false);
   const [sessions] = useState<SessionWhatsapp[]>([]);
   const [globalStatus, setGlobalStatus] = useState<StatusData | null>(null);
   const { user } = useUser();
@@ -53,70 +52,64 @@ export default function Dashboard() {
       alert("Por favor, selecione um arquivo e digite uma mensagem");
       return;
     }
-  
-    setIsSending(true);
-  
+
     try {
       const buffer = await file.arrayBuffer();
       const workbook = XLSX.read(buffer, { type: "array" });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rawData: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-  
-      // Monta a lista de mensagens
-      const mensagens = rawData
-        .map((row: unknown[]) => {
+
+      const mensagens = rawData.map((row: unknown[]) => {
           const nome = String(row[0]);
           const numeroOriginal = String(row[1]);
           const numeroLimpo = numeroOriginal.replace(/\D/g, "");
-  
           if (nome && numeroLimpo) {
-            return {
-              nome: nome,
-              numero: numeroLimpo,
-              mensagem: message,
-            };
+            return { nome, numero: numeroLimpo, mensagem: message };
           }
           return null;
-        })
-        .filter(Boolean);
-  
+        }).filter(Boolean);
+
       if (mensagens.length === 0) {
-        alert("Nenhum contato válido (com nome e número) foi encontrado na planilha.");
+        alert("Nenhum contato válido encontrado na planilha.");
         return;
       }
-  
-      const payload = {
-        numsession: user?.id,
-        mensagens,
-      };
 
-      //console.log("Enviando para o backend:", payload); 
-  
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/enviar`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          }
-        );
-  
+      const payload = { numsession: user?.id, mensagens };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/enviar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        toast.success(`${mensagens.length} mensagens enviadas para a fila com sucesso!`);
+      } else {
         const result = await response.json();
-  
-        if (response.ok) {
-          toast.success(`${mensagens.length} mensagens enviadas para a fila com sucesso!`);
-        } else {
-          toast.error(`Erro: ${result.message}`);
-        }
-  
-      } catch{
-        toast.error("Erro de conexão com o servidor.");
+        toast.error(`Erro: ${result.message}`);
       }
     } catch{
-      toast.error("Erro durante a leitura da planilha.");
-    } finally {
-      setIsSending(false);
+      toast.error("Erro ao ler a planilha ou conectar ao servidor.");
+    }
+  };
+
+  const handleCancelSend = async () => {
+    if (!user?.id) return;
+  
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/fila/${user.id}/purge`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        toast.success('Campanha cancelada com sucesso.');
+      } else {
+        throw new Error('Falha ao enviar comando de cancelamento.');
+      }
+      
+    } catch (error) {
+      toast.error('Erro ao tentar cancelar a campanha.');
+      console.error(error);
     }
   };
 
@@ -198,7 +191,7 @@ export default function Dashboard() {
                   message={message}
                   onMessageChange={setMessage}
                   onSend={sendMessages}
-                  isSending={isSending}
+                  onCancel={handleCancelSend}
                   isFileSelected={!!file}
                 />
               </div>
@@ -208,5 +201,5 @@ export default function Dashboard() {
       </div>
       <Toaster richColors position="bottom-right" />
     </SidebarProvider>
-);
-}
+  );
+};
