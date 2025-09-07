@@ -88,7 +88,7 @@ export default function Dashboard() {
         const result = await response.json();
         toast.error(`Erro: ${result.message}`);
       }
-    } catch (error) {
+    } catch{
       toast.error("Erro ao ler a planilha ou conectar ao servidor.");
     }
   };
