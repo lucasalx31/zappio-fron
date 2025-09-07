@@ -84,6 +84,7 @@ export default function Dashboard() {
 
       if (response.ok) {
         toast.success(`${mensagens.length} mensagens enviadas para a fila com sucesso!`);
+        setFile(null);
       } else {
         const result = await response.json();
         toast.error(`Erro: ${result.message}`);
