@@ -231,7 +231,7 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
 
         <div className="flex gap-2 mt-auto">
           <Button
-            className="flex-1 bg-green-600 hover:bg-green-700"
+            className="flex-1 bg-green-600 hover:bg-green-700 cursor-pointer"
             onClick={conectarSessao}
             disabled={isConnecting || isClosing || connectionStatus === "connected"}
           >
@@ -255,7 +255,7 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" disabled={isConnecting || isClosing} className="flex-1">
+              <Button variant="destructive" disabled={isConnecting || isClosing} className="flex-1 cursor-pointer">
                 {isClosing ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
