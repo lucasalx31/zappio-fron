@@ -107,7 +107,7 @@ export default function SettingsPage() {
           <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-14 items-center justify-between px-4 md:px-6">
               <div className="flex items-center gap-3">
-                <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")} className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")} className="flex items-center gap-2 cursor-pointer">
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <h1 className="text-xl font-semibold">Configurações</h1>
@@ -152,7 +152,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="flex justify-end">
-                    <Button onClick={handleSaveProfile} disabled={savingProfile || !isProfileDirty} className="bg-green-600 hover:bg-green-700">
+                    <Button onClick={handleSaveProfile} disabled={savingProfile || !isProfileDirty} className="bg-green-600 hover:bg-green-700 cursor-pointer">
                       {savingProfile ? (
                         <>
                           <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -223,7 +223,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="flex justify-end mt-4">
-                    <Button onClick={handleChangePassword} disabled={savingPassword} variant="destructive">
+                    <Button onClick={handleChangePassword} disabled={savingPassword} variant="destructive" className="cursor-pointer">
                       {savingPassword ? (
                         <>
                           <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
