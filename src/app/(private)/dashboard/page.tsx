@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-import type { SessionWhatsapp } from "@/interfaces/session";
 import { useState, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
