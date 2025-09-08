@@ -36,7 +36,7 @@ export default function SendMessageCard({
             placeholder="Digite sua mensagem aqui..."
             value={message}
             onChange={(e) => onMessageChange(e.target.value)}
-            className="h-40 overflow-y-auto resize-none border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 hover:border-blue-400 transition-colors"
+            className="h-50 overflow-y-auto resize-none border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 hover:border-blue-400 transition-colors"
             rows={6}
           />
           <p className="text-xs text-muted-foreground mt-2">
