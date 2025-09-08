@@ -20,7 +20,6 @@ import { toast } from "sonner"
 export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
-  const [sessions] = useState<SessionWhatsapp[]>([]);
   const [globalStatus, setGlobalStatus] = useState<StatusData | null>(null);
   const { user } = useUser();
 
