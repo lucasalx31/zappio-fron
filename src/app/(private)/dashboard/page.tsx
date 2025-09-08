@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-import type { SessionWhatsapp } from "@/interfaces/session";
 import { useState, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +19,6 @@ import { toast } from "sonner"
 export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
-  const [sessions] = useState<SessionWhatsapp[]>([]);
   const [globalStatus, setGlobalStatus] = useState<StatusData | null>(null);
   const { user } = useUser();
 
@@ -139,14 +137,8 @@ export default function Dashboard() {
                     <Users className="h-4 w-4 text-blue-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
-                      {
-                        sessions.filter(
-                          (s) =>
-                            (s.connectionStatus?.status || s.status) ===
-                            "connected"
-                        ).length
-                      }
+                    <div className="text-xl font-bold">
+                     Em breve
                     </div>
                   </CardContent>
                 </Card>
@@ -159,14 +151,8 @@ export default function Dashboard() {
                     <Send className="h-4 w-4 text-purple-600" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
-                      {
-                        sessions.filter((s) =>
-                          ["disconnected", "error", "failed"].includes(
-                            s.connectionStatus?.status || s.status
-                          )
-                        ).length
-                      }
+                    <div className="text-xl font-bold">
+                      Em breve
                     </div>
                   </CardContent>
                 </Card>
