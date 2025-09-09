@@ -6,7 +6,7 @@ import { jwtVerify } from "jose";
 const JWT_NAME = "auth-token";
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
-const protectedMatchers = ["/dashboard", "/settings"];
+const protectedMatchers = ["/dashboard", "/settings", "/report"];
 
 async function isAuthenticated(req: NextRequest) {
   const token = req.cookies.get(JWT_NAME)?.value;
