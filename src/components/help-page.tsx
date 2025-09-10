@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { WhatsAppSidebar } from "@/components/whatsapp-sidebar"
-import { Play, FileText, MessageCircle, Upload, Send, ChevronDown, ChevronRight, CheckCircle, Circle } from "lucide-react"
+import { Play, MessageCircle, Upload, Send, ChevronDown, ChevronRight, CheckCircle, Circle } from "lucide-react"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { useState } from "react";
 
@@ -15,10 +15,10 @@ export type videoItem ={
 }
 
 const videoItems: videoItem[] = [
-    { title: "Como Conectar o WhatsApp", description: "Aprenda a conectar sua conta do WhatsApp ao Zappio", videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
-    { title: "Upload de Contatos", description: "Como fazer upload da planilha de contatos corretamente", videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
-    { title: "Enviando Mensagens", description: "Como criar e enviar campanhas de mensagens em massa", videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
-    { title: "Dicas e Boas Práticas", description: "Melhores práticas para usar o Zappio eficientemente", videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
+    { title: "Como Conectar o WhatsApp", description: "Aprenda a conectar sua conta do WhatsApp ao Zappio", videoUrl: "" },
+    { title: "Upload de Contatos", description: "Como fazer upload da planilha de contatos corretamente", videoUrl: "" },
+    { title: "Enviando Mensagens", description: "Como criar e enviar campanhas de mensagens em massa", videoUrl: "" },
+    { title: "Dicas e Boas Práticas", description: "Melhores práticas para usar o Zappio eficientemente", videoUrl: "" },
 ]
 
 
@@ -46,8 +46,8 @@ const toggleStep = (stepNumber: number) => {
             <div className="max-w-6xl mx-auto space-y-8">
               {/* Seção de Vídeos Tutoriais */}
               <section>
-                <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                  <Play className="w-6 h-6 text-green-600" />
+                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 justify-center">
+                  {/* <Play className="w-6 h-6 text-green-600" /> */}
                   Vídeos Tutoriais
                 </h2>
 
@@ -76,10 +76,9 @@ const toggleStep = (stepNumber: number) => {
                 </div>
               </section>
 
-              {/* Seção de Guias Escritos */}
+              {/* Seção de Guias */}
               <section>
-                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                  <FileText className="w-6 h-6 text-blue-600" />
+                <h2 className="text-2xl font-bold mb-10 mt-10 flex items-center gap-2 justify-center">
                   Guias Passo a Passo
                 </h2>
 
@@ -88,11 +87,14 @@ const toggleStep = (stepNumber: number) => {
                   <div className="relative">
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0 w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                        <MessageCircle className="w-5 h-5 text-green-600" />
+                        <MessageCircle className="w-5 h-5 text-green-500" />
                       </div>
                       <div className="flex-1">
-                        <Card className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
-                          <CardHeader className="cursor-pointer" onClick={() => toggleStep(1)}>
+                        <Card className="border-l-4 border-l-green-500 transition-all duration-300 ease-in-out hover:shadow-xl active:scale-[0.99]">
+                          <CardHeader
+                            className="cursor-pointer"
+                            onClick={() => toggleStep(1)}
+                          >
                             <div className="flex items-center justify-between">
                               <div>
                                 <CardTitle className="text-lg text-green-700 dark:text-green-400">
@@ -114,10 +116,10 @@ const toggleStep = (stepNumber: number) => {
                               <div className="space-y-4">
                                 {[
                                   'Clique em "Conectar sessão" no card de conexão',
-                                  "Aguarde o QR Code aparecer na tela",
-                                  "Abra o WhatsApp no seu celular",
-                                  "Vá em Configurações → Aparelhos conectados → Conectar um aparelho",
-                                  "Escaneie o QR Code exibido na tela",
+                                  'Aguarde o QR Code aparecer na tela',
+                                  'Abra o WhatsApp no seu celular',
+                                  'Vá em Configurações → Aparelhos conectados → Conectar um aparelho',
+                                  'Escaneie o QR Code exibido na tela',
                                 ].map((step, index) => (
                                   <div
                                     key={index}
@@ -126,7 +128,9 @@ const toggleStep = (stepNumber: number) => {
                                     <div className="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
                                       {index + 1}
                                     </div>
-                                    <p className="text-sm text-green-800 dark:text-green-200">{step}</p>
+                                    <p className="text-sm text-green-800 dark:text-green-200">
+                                      {step}
+                                    </p>
                                   </div>
                                 ))}
                               </div>
@@ -141,17 +145,22 @@ const toggleStep = (stepNumber: number) => {
                   <div className="relative">
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                        <Upload className="w-5 h-5 text-blue-600" />
+                        <Upload className="w-5 h-5 text-blue-500" />
                       </div>
                       <div className="flex-1">
-                        <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-                          <CardHeader className="cursor-pointer" onClick={() => toggleStep(2)}>
+                        <Card className="border-l-4 border-l-blue-500 transition-all duration-300 ease-in-out hover:shadow-xl active:scale-[0.99]">
+                          <CardHeader
+                            className="cursor-pointer"
+                            onClick={() => toggleStep(2)}
+                          >
                             <div className="flex items-center justify-between">
                               <div>
                                 <CardTitle className="text-lg text-blue-700 dark:text-blue-400">
                                   2. Preparando sua lista de contatos
                                 </CardTitle>
-                                <CardDescription>Configure sua planilha de contatos no formato correto</CardDescription>
+                                <CardDescription>
+                                  Configure sua planilha de contatos no formato correto
+                                </CardDescription>
                               </div>
                               {expandedStep === 2 ? (
                                 <ChevronDown className="w-5 h-5 text-muted-foreground" />
@@ -162,11 +171,13 @@ const toggleStep = (stepNumber: number) => {
                           </CardHeader>
                           {expandedStep === 2 && (
                             <CardContent className="pt-0">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-3">
-                                  <h4 className="font-semibold text-blue-700 dark:text-blue-400">Formatos Aceitos</h4>
+                                  <h4 className="font-semibold text-blue-700 dark:text-blue-400">
+                                    Formatos Aceitos
+                                  </h4>
                                   <div className="space-y-2">
-                                    {[".xlsx", ".csv", ".xls"].map((format) => (
+                                    {['.xlsx', '.csv', '.xls'].map((format) => (
                                       <div
                                         key={format}
                                         className="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-950 rounded"
@@ -178,12 +189,12 @@ const toggleStep = (stepNumber: number) => {
                                   </div>
                                 </div>
                                 <div className="space-y-3">
-                                  <h4 className="font-semibold text-blue-700 dark:text-blue-400">Dicas Importantes</h4>
+                                  <h4 className="font-semibold text-blue-700 dark:text-blue-400">
+                                    Dicas Importantes
+                                  </h4>
                                   <div className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
-                                    <p>• Inclua DDD (ex: 11987654321)</p>
-                                    <p>• Baixe nosso modelo como referência</p>
-                                    <p>• Máximo de 1000 contatos por envio</p>
-                                    <p>• Verifique números duplicados</p>
+                                    <p>Inclua DDD (ex: 11987654321)</p>
+                                    <p>Baixe nosso modelo como referência</p>
                                   </div>
                                 </div>
                               </div>
@@ -201,14 +212,19 @@ const toggleStep = (stepNumber: number) => {
                         <Send className="w-5 h-5 text-purple-600" />
                       </div>
                       <div className="flex-1">
-                        <Card className="border-l-4 border-l-purple-500 hover:shadow-md transition-shadow">
-                          <CardHeader className="cursor-pointer" onClick={() => toggleStep(3)}>
+                        <Card className="border-l-4 border-l-purple-500 transition-all duration-300 ease-in-out hover:shadow-xl active:scale-[0.99]">
+                          <CardHeader
+                            className="cursor-pointer"
+                            onClick={() => toggleStep(3)}
+                          >
                             <div className="flex items-center justify-between">
                               <div>
                                 <CardTitle className="text-lg text-purple-700 dark:text-purple-400">
                                   3. Enviando mensagens
                                 </CardTitle>
-                                <CardDescription>Execute sua campanha de mensagens com segurança</CardDescription>
+                                <CardDescription>
+                                  Execute sua campanha de mensagens com segurança
+                                </CardDescription>
                               </div>
                               {expandedStep === 3 ? (
                                 <ChevronDown className="w-5 h-5 text-muted-foreground" />
@@ -226,22 +242,24 @@ const toggleStep = (stepNumber: number) => {
                                   </h4>
                                   <div className="space-y-2">
                                     {[
-                                      "WhatsApp conectado e ativo",
-                                      "Planilha carregada com sucesso",
-                                      "Mensagem revisada e testada",
-                                      "Horário adequado para envio",
+                                      'WhatsApp conectado e ativo',
+                                      'Planilha carregada com sucesso',
+                                      'Mensagem revisada e testada',
+                                      'Horário adequado para envio',
                                     ].map((item, index) => (
                                       <div key={index} className="flex items-center gap-2">
                                         <Circle className="w-4 h-4 text-purple-600" />
-                                        <span className="text-sm text-purple-800 dark:text-purple-200">{item}</span>
+                                        <span className="text-sm text-purple-800 dark:text-purple-200">
+                                          {item}
+                                        </span>
                                       </div>
                                     ))}
                                   </div>
                                 </div>
                                 <div className="bg-amber-50 dark:bg-amber-950 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
                                   <p className="text-sm text-amber-800 dark:text-amber-200">
-                                    <strong>⚠️ Importante:</strong> O processo pode levar alguns minutos. Não feche a
-                                    página durante o envio.
+                                    <strong>⚠️ Importante:</strong> O processo pode levar
+                                    alguns minutos. Não feche a página durante o envio.
                                   </p>
                                 </div>
                               </div>
@@ -255,8 +273,10 @@ const toggleStep = (stepNumber: number) => {
               </section>
 
               {/* FAQ */}
-              <section>
-                <h2 className="text-2xl font-bold mb-6">Perguntas Frequentes</h2>
+              <section className="mb-14">
+                <h2 className="text-2xl font-bold mb-6 mt-10 flex items-center gap-2 justify-center">
+                  Perguntas Frequentes
+                </h2>
 
                 <Accordion type="single" collapsible>
                   <AccordionItem value="item-1">
