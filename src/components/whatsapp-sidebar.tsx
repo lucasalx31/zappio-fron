@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Moon, Sun, MessageCircle, Settings, LogOut } from "lucide-react";
+import { Moon, Sun, MessageCircle, Settings, LogOut, BarChart3 } from "lucide-react";
 
 import {
   Sidebar,
@@ -32,6 +32,7 @@ import { useUser } from "@/contexts/userContext";
 
 const menuItems = [
   { title: "Dashboard", icon: MessageCircle, href: "/dashboard" },
+  { title: "Relatórios", icon: BarChart3, href: "/report" },
 ];
 
 export function WhatsAppSidebar() {
