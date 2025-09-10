@@ -52,8 +52,8 @@ const toggleStep = (stepNumber: number) => {
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {videoItems.map((video) => (
-                        <Card>
+                    {videoItems.map((video, index) => (
+                        <Card key={index}>
                         <CardHeader>
                           <CardTitle className="text-lg">{video.title}</CardTitle>
                           <CardDescription>{video.description}</CardDescription>
