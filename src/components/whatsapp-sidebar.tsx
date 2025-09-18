@@ -16,6 +16,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 
 const menuItems = [
   { title: "Dashboard", icon: MessageCircle, href: "/dashboard" },
+  // { title: "Relatórios", icon: BarChart3, href: "/report" },
   { title: "Ajuda", icon: Info, href: "/help" }
 ];
 
