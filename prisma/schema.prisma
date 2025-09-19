@@ -23,4 +23,57 @@ model User {
   updatedAt DateTime @updatedAt
   messagesSent Int   @default(0)  
   invalidNumbers Int @default(0) 
+
+  // Um usuário pode ter várias campanhas.
+  campaigns Campaign[]
+
+}
+
+enum CampaignStatus {
+  SCHEDULED // A campanha foi criada mas ainda não começou a ser enviada.
+  RUNNING   // A campanha está em processo de envio.
+  COMPLETED // A campanha finalizou todos os envios.
+  CANCELLED // A campanha foi cancelada pelo usuário.
+}
+
+enum RecipientStatus {
+  QUEUED    // O destinatário está na fila para envio.
+  SENT      // A mensagem foi enviada com sucesso para este destinatário.
+  FAILED    // Falha ao enviar a mensagem (ex: número inválido, erro de API).
+}
+
+model Campaign {
+  id          String   @id @default(uuid())
+  name        String
+  message     String   @db.Text
+  status      CampaignStatus @default(SCHEDULED)
+  
+  scheduledAt DateTime  // Data/hora que o usuário AGENDOU o início.
+  startedAt   DateTime? // Data/hora que o sistema REALMENTE começou o envio.
+  finishedAt  DateTime? // Data/hora que o envio foi concluído ou cancelado.
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Link para o usuário que criou a campanha.
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Atalho para acessar todos os destinatários desta campanha.
+  recipients CampaignRecipient[]
+}
+
+// Guarda cada destinatário individual de uma campanha.
+model CampaignRecipient {
+  id          String   @id @default(uuid())
+  nome        String?
+  phoneNumber String
+  status      RecipientStatus @default(QUEUED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Link para a campanha à qual este destinatário pertence.
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 }
