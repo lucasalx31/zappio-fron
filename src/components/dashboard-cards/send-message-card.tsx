@@ -3,21 +3,29 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Send, Ban } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type SendMessageCardProps = {
+  campaignName: string;
+  onCampaignNameChange: (newName: string) => void;
   message: string;
   onMessageChange: (newMessage: string) => void;
   onSend: () => void;
   onCancel: () => void;
   isFileSelected: boolean;
+  isSending: boolean;
 };
 
 export default function SendMessageCard({
+  campaignName,
+  onCampaignNameChange,
   message,
   onMessageChange,
   onSend,
   onCancel,
   isFileSelected,
+  isSending
 }: SendMessageCardProps) {
   return (
     <Card className="flex flex-col">
@@ -32,16 +40,29 @@ export default function SendMessageCard({
       </CardHeader>
       <CardContent className="flex-1 flex flex-col">
         <div className="flex-1 flex flex-col">
-          <Textarea
-            placeholder="Digite sua mensagem aqui..."
-            value={message}
-            onChange={(e) => onMessageChange(e.target.value)}
-            className="h-50 overflow-y-auto resize-none border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 hover:border-blue-400 transition-colors"
-            rows={6}
-          />
-          <p className="text-xs text-muted-foreground mt-2">
-            {message.length} caracteres
-          </p>
+        <div className="flex flex-col gap-3 mb-5">
+            <Label className="gap-10" htmlFor="campaign-name">Nome da Campanha</Label>
+            <Input
+              id="campaign-name"
+              placeholder="Ex: Promoção de Dia dos Pais"
+              value={campaignName}
+              onChange={(e) => onCampaignNameChange(e.target.value)}
+              disabled={isSending}
+            />
+          </div>
+          <div className="flex flex-col gap-3 mb-5">
+            <Label htmlFor="message-text">Mensagem</Label>
+            <Textarea
+              placeholder="Digite sua mensagem aqui..."
+              value={message}
+              onChange={(e) => onMessageChange(e.target.value)}
+              className="h-50 overflow-y-auto resize-none border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 hover:border-blue-400 transition-colors"
+              rows={6}
+            />
+            <p className="text-xs text-muted-foreground mt-2">
+              {message.length} caracteres
+            </p>
+          </div>
         </div>
         <div className="flex flex-col gap-2 mt-4">
           <Button
