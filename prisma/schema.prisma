@@ -66,6 +66,7 @@ model Campaign {
 // Guarda cada destinatário individual de uma campanha.
 model CampaignRecipient {
   id          String   @id @default(uuid())
+  nome        String?
   phoneNumber String
   status      RecipientStatus @default(QUEUED)
 

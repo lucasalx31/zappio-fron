@@ -19,7 +19,9 @@ import { toast } from "sonner"
 export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
+  const [campaignName, setCampaignName] = useState("");
   const [globalStatus, setGlobalStatus] = useState<StatusData | null>(null);
+  const [isSending, setIsSending] = useState(false);
   const { user } = useUser();
 
   useEffect(() => {
@@ -45,11 +47,12 @@ export default function Dashboard() {
     };
   }, []);
 
-  const sendMessages = async () => {
-    if (!file || !message.trim()) {
-      alert("Por favor, selecione um arquivo e digite uma mensagem");
+  const createCampaign = async () => {
+    if (!campaignName.trim() || !file || !message.trim()) {
+      toast.error("Por favor, preencha todos os campos: Nome, Lista e Mensagem.");
       return;
     }
+    setIsSending(true);
 
     try {
       const buffer = await file.arrayBuffer();
@@ -57,41 +60,47 @@ export default function Dashboard() {
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rawData: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-      const mensagens = rawData.map((row: unknown[]) => {
-          const nome = String(row[0]);
-          const numeroOriginal = String(row[1]);
-          const numeroLimpo = numeroOriginal.replace(/\D/g, "");
-          if (nome && numeroLimpo) {
-            return { nome, numero: numeroLimpo, mensagem: message };
-          }
-          return null;
-        }).filter(Boolean);
+      const contacts = rawData
+        .map((row: unknown[]) => String(row[1] || "").replace(/\D/g, ""))
+        .filter(phone => phone.length >= 10);
 
-      if (mensagens.length === 0) {
-        alert("Nenhum contato válido encontrado na planilha.");
+      if (contacts.length === 0) {
+        toast.error("Nenhum número de telefone válido encontrado na segunda coluna da planilha.");
+        setIsSending(false);
         return;
       }
 
-      const payload = { numsession: user?.id, mensagens };
+      const payload = {
+        name: campaignName,
+        message: message,
+        contacts: contacts,
+        numsession: user?.id,
+      };
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/enviar`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/campaigns`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        toast.success(`${mensagens.length} mensagens enviadas para a fila com sucesso!`);
+        toast.success(`Campanha "${campaignName}" criada com sucesso!`, {
+          description: `${contacts.length} contatos foram enfileirados para envio.`,
+        });
         setFile(null);
+        setMessage("");
+        setCampaignName("");
       } else {
         const result = await response.json();
-        toast.error(`Erro: ${result.message}`);
+        toast.error(`Erro ao criar campanha: ${result.message}`);
       }
-    } catch{
+    } catch (err) {
       toast.error("Erro ao ler a planilha ou conectar ao servidor.");
+      console.error(err);
+    } finally {
+      setIsSending(false);
     }
   };
-
   const handleCancelSend = async () => {
     if (!user?.id) return;
   
@@ -177,9 +186,12 @@ export default function Dashboard() {
                 <SendMessageCard
                   message={message}
                   onMessageChange={setMessage}
-                  onSend={sendMessages}
+                  campaignName={campaignName}
+                  onCampaignNameChange={setCampaignName}
+                  onSend={createCampaign}
                   onCancel={handleCancelSend}
                   isFileSelected={!!file}
+                  isSending={isSending}
                 />
               </div>
             </div>
