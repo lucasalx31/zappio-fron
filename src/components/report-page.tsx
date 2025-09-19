@@ -81,7 +81,7 @@ export function ReportsPage() {
   const downloadCampaign = (c: CampaignWithStats) => {
     const headers = ["Campanha", "Status", "Data Agendada", "Total Contatos", "Enviadas", "Inválidos", "Taxa Sucesso (%)", "Mensagem"];
     const row = [c.name, c.status, format(new Date(c.scheduledAt), "dd/MM/yyyy HH:mm"), c.totalContacts, c.sentMessages, c.invalidNumbers, getSuccessRate(c.sentMessages, c.totalContacts), c.message];
-    const csvEscape = (val: any) => `"${String(val ?? "").replace(/"/g, '""')}"`;
+    const csvEscape = (val: string | number | null | undefined) => `"${String(val ?? "").replace(/"/g, '""')}"`;
     const csv = "sep=,\n" + headers.map(csvEscape).join(",") + "\n" + row.map(csvEscape).join(",").replace(/\n/g, "\\n") + "\n";
     
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
