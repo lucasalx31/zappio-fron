@@ -61,11 +61,18 @@ export default function Dashboard() {
       const rawData: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
       const contacts = rawData
-        .map((row: unknown[]) => String(row[1] || "").replace(/\D/g, ""))
-        .filter(phone => phone.length >= 10);
+        .map((row: unknown[]) => {
+            const nome = String(row[0] || "");
+            const numero = String(row[1] || "").replace(/\D/g, "");
+            if (nome && numero.length >= 10) {
+                return { nome, numero };
+            }
+            return null;
+        })
+        .filter((contact): contact is { nome: string; numero: string } => contact !== null);
 
       if (contacts.length === 0) {
-        toast.error("Nenhum número de telefone válido encontrado na segunda coluna da planilha.");
+        toast.error("Nenhum contato válido (com nome e número) encontrado na planilha.");
         setIsSending(false);
         return;
       }
