@@ -8,13 +8,17 @@ export async function authenticateUser(email: string, password: string) {
     })
 
     if (!user) {
-      return { success: false, error: 'Usuário não encontrado' }
+      return { success: false, error: 'Credenciais inválidas' }
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password)
 
     if (!isPasswordValid) {
-      return { success: false, error: 'Senha incorreta' }
+      return { success: false, error: 'Credenciais inválidas' }
+    }
+
+    if (!user.isActive) {
+      return { success: false, error: 'Sua conta está inativa. Entre em contato com o suporte.' }
     }
 
     return { 
@@ -22,6 +26,7 @@ export async function authenticateUser(email: string, password: string) {
       user: {
         id: user.id,
         email: user.email,
+        name: user.name,
         createdAt: user.createdAt
       }
     }
