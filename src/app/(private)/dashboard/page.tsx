@@ -3,7 +3,6 @@
 import type React from "react";
 import { useState, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Toaster } from "@/components/ui/sonner";
 import { Users, Send } from "lucide-react";
 import { WhatsAppSidebar } from "@/components/whatsapp-sidebar";
@@ -15,6 +14,10 @@ import UploadCard from "@/components/dashboard-cards/upload-card";
 import SendMessageCard from "@/components/dashboard-cards/send-message-card";
 import { type ConnectionStatus, type StatusData } from "@/interfaces/status-connection";
 import { toast } from "sonner"
+import { SentMessageStatusCard } from "@/components/dashboard-cards/sent-message-status-card";
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null);
@@ -23,6 +26,11 @@ export default function Dashboard() {
   const [globalStatus, setGlobalStatus] = useState<StatusData | null>(null);
   const [isSending, setIsSending] = useState(false);
   const { user } = useUser();
+
+  const { data: statsData } = useSWR(
+    user?.id ? `${process.env.NEXT_PUBLIC_API_URL}/api/stats/${user.id}` : null,
+    fetcher
+  );
 
   useEffect(() => {
     const handleDragOver = (e: DragEvent) => {
@@ -145,33 +153,17 @@ export default function Dashboard() {
             <div className="flex flex-col gap-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <StatusCard onStatusChange={setGlobalStatus} />
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Mensagens Enviadas
-                    </CardTitle>
-                    <Users className="h-4 w-4 text-blue-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-xl font-bold">
-                     Em breve
-                    </div>
-                  </CardContent>
-                </Card>
+                <SentMessageStatusCard 
+              title="Mensagens Enviadas"
+              value={statsData?.sentMessages}
+              icon={<Users className="h-4 w-4 text-blue-600" />}
+            />
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Números Inválidos
-                    </CardTitle>
-                    <Send className="h-4 w-4 text-purple-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-xl font-bold">
-                      Em breve
-                    </div>
-                  </CardContent>
-                </Card>
+            <SentMessageStatusCard 
+              title="Números Inválidos"
+              value={statsData?.invalidNumbers}
+              icon={<Send className="h-4 w-4 text-purple-600" />}
+            />
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                 {/* Conectar WhatsApp */}
