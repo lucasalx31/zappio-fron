@@ -84,7 +84,7 @@ const guideSteps = [
         <div className="bg-purple-50 dark:bg-purple-950 p-4 rounded-lg">
           <h4 className="font-semibold text-purple-700 dark:text-purple-400 mb-3">Checklist Pré-Envio</h4>
           <div className="space-y-2">
-            {['WhatsApp conectado e ativo', 'Planilha carregada com sucesso', 'Mensagem revisada e testada', 'Horário adequado para envio'].map((item, index) => (
+            {['WhatsApp conectado e ativo', 'Planilha carregada com sucesso','Nome da Campanha preenchido', 'Mensagem revisada e testada', 'Horário adequado para envio'].map((item, index) => (
               <div key={index} className="flex items-center gap-2">
                 <Circle className="w-4 h-4 text-purple-600" />
                 <span className="text-sm text-purple-800 dark:text-purple-200">{item}</span>
@@ -94,7 +94,7 @@ const guideSteps = [
         </div>
         <div className="bg-amber-50 dark:bg-amber-950 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
           <p className="text-sm text-amber-800 dark:text-amber-200">
-            <strong>⚠️ Importante:</strong> O processo pode levar alguns minutos. Não feche a página durante o envio.
+            <strong>⚠️ Importante:</strong> O processo pode levar alguns secundos. Não feche a página durante o envio.
           </p>
         </div>
       </div>
@@ -111,12 +111,17 @@ const faqItems = [
   {
     value: "item-2",
     question: "Qual o limite de mensagens por dia?",
-    answer: "Recomendamos não enviar mais de 500 mensagens por dia para evitar bloqueios do WhatsApp. Use intervalos entre os envios para melhor entrega."
+    answer: "Atualmente o sistema atua com a média de 200 envios por dia de 08h as 21h."
   },
   {
     value: "item-3",
     question: "Minha planilha não está sendo reconhecida",
     answer: "Verifique se sua planilha está no formato correto (.xlsx, .csv, .xls) e se os números estão no formato brasileiro com DDI+DDD (ex: 55119...)."
+  },
+  {
+    value: "item-4",
+    question: "Sobre bloqueios de número",
+    answer: "Não recomendamos o envio manual simultâneo de mensagens. O ZappiO já possui mecanismos de proteção contra bloqueios, mas o envio paralelo pode aumentar o risco de bloqueio do número."
   }
 ];
 
