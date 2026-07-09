@@ -30,7 +30,7 @@ export default function Dashboard() {
   const { user } = useUser();
 
   const { data: statsData } = useSWR(
-    user?.id ? `${process.env.NEXT_PUBLIC_API_URL}/api/stats/${user.id}` : null,
+    user?.id ? `${process.env.NEXT_PUBLIC_API_URL}/api/status/${user.id}` : null,
     fetcher
   );
 
