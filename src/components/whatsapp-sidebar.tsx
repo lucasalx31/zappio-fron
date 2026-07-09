@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
 import { useUser } from "@/contexts/userContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { NGROK_SKIP_HEADER } from "@/lib/api/http";
 
 const menuItems = [
   { title: "Dashboard", icon: MessageCircle, href: "/dashboard" },
@@ -39,6 +40,7 @@ export function WhatsAppSidebar() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...NGROK_SKIP_HEADER,
         },
         body: JSON.stringify({
           numsession: user?.id,
