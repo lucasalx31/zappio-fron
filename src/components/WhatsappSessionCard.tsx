@@ -147,6 +147,11 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
           setConnectionStatus("disconnected")
         } else if (data.status === "INITIALIZING") {
           setConnectionStatus("connecting")
+        } else if (["qrReadError", "autocloseCalled", "browserClose"].includes(data.status)) {
+          // Sessao expirou/falhou no backend (ex: QR nao foi escaneado a tempo).
+          // Sem isso o card ficava travado em "Preparando conexao..." para sempre.
+          setQrCode(null)
+          setConnectionStatus("error")
         }
       }
     }
@@ -233,7 +238,13 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
           <Button
             className="flex-1 bg-green-600 hover:bg-green-700 cursor-pointer"
             onClick={conectarSessao}
-            disabled={isConnecting || isClosing || connectionStatus === "connected"}
+            disabled={
+              isConnecting ||
+              isClosing ||
+              connectionStatus === "connected" ||
+              connectionStatus === "connecting" ||
+              (connectionStatus === "qr_required" && !!qrCode)
+            }
           >
             {isConnecting ? (
               <>
