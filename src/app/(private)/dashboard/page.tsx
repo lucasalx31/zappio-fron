@@ -16,8 +16,10 @@ import { type ConnectionStatus, type StatusData } from "@/interfaces/status-conn
 import { toast } from "sonner"
 import { SentMessageStatusCard } from "@/components/dashboard-cards/sent-message-status-card";
 import useSWR from "swr";
+import { NGROK_SKIP_HEADER } from "@/lib/api/http";
 
-const fetcher = (url: string) => fetch(url).then(res => res.json());
+const fetcher = (url: string) =>
+  fetch(url, { headers: { ...NGROK_SKIP_HEADER } }).then(res => res.json());
 
 export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null);
@@ -94,7 +96,7 @@ export default function Dashboard() {
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/campaigns`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...NGROK_SKIP_HEADER },
         body: JSON.stringify(payload),
       });
 
@@ -122,6 +124,7 @@ export default function Dashboard() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/fila/${user.id}/purge`, {
         method: 'DELETE',
+        headers: { ...NGROK_SKIP_HEADER },
       });
   
       if (response.ok) {

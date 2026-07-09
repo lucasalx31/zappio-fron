@@ -22,10 +22,11 @@ import {
 } from "./report-components/CampaignsTable";
 import { PaginationControls } from "./report-components/PaginationControls";
 import { CampaignDetailsModal } from "./report-components/CampaignDetailsModal";
+import { NGROK_SKIP_HEADER } from "@/lib/api/http";
 
 // Função fetcher para o SWR
 const fetcher = (url: string) =>
-  fetch(url).then((res) => {
+  fetch(url, { headers: { ...NGROK_SKIP_HEADER } }).then((res) => {
     if (!res.ok) {
       throw new Error("Falha ao buscar os dados.");
     }

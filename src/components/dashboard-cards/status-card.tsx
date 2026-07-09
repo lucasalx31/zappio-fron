@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap, ZapOff, QrCode, Loader2 } from 'lucide-react';
 import { type StatusData, type ConnectionStatus } from "@/interfaces/status-connection";
 import { useUser } from "@/contexts/userContext";
+import { NGROK_SKIP_HEADER } from "@/lib/api/http";
 
 interface StatusCardProps {
   onStatusChange?: (data: StatusData) => void;
@@ -28,7 +29,9 @@ export function StatusCard({ onStatusChange }: StatusCardProps) {
       // O setIsLoading(true) pode ser colocado aqui se você quiser o feedback de loading a cada requisição
       try {
         // A URL agora usará o user.id que sabemos que existe
-        const response = await fetch(`${API_URL}/status/${user.id}`); 
+        const response = await fetch(`${API_URL}/status/${user.id}`, {
+          headers: { ...NGROK_SKIP_HEADER },
+        });
         if (!response.ok) {
           throw new Error(`Falha ao buscar dados de status: ${response.statusText}`);
         }

@@ -7,6 +7,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { MessageCircle, Wifi, WifiOff, Loader2, CheckCircle, AlertCircle } from "lucide-react"
 import io, { type Socket } from "socket.io-client"
 import { type ConnectionStatus } from "@/interfaces/status-connection";
+import { NGROK_SKIP_HEADER } from "@/lib/api/http";
 
 type QrData = { message?: string; base64: string };
 type StatusUpdateData = { session?: string; message?: string; status: string };
@@ -27,7 +28,12 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
   const API_URL = process.env.NEXT_PUBLIC_API_URL
   const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL
 
-  const socket: Socket = useMemo(() => io(SOCKET_URL, { autoConnect: true }), [SOCKET_URL])
+  // transports: ["websocket"] evita a fase inicial de long-polling do socket.io,
+  // que era bloqueada pela pagina de aviso do ngrok e impedia o QR code de chegar.
+  const socket: Socket = useMemo(
+    () => io(SOCKET_URL, { autoConnect: true, transports: ["websocket"] }),
+    [SOCKET_URL]
+  )
 
   const getStatusConfig = (status: ConnectionStatus) => {
     switch (status) {
@@ -72,9 +78,9 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
   const encerrarSessao = async () => {
       await fetch(`${API_URL}/encerrar`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...NGROK_SKIP_HEADER },
         body: JSON.stringify({ numsession }),
-      }); 
+      });
   };
 
   const conectarSessao = async () => {
@@ -88,7 +94,7 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
     try {
       const res = await fetch(`${API_URL}/conectar`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...NGROK_SKIP_HEADER },
         body: JSON.stringify({ numsession }),
       });
 
@@ -108,7 +114,7 @@ export function WhatsappSessionCard({ sessionName, numsession, initialStatus }: 
     try {
       const res = await fetch(`${API_URL}/desconectar`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...NGROK_SKIP_HEADER },
         body: JSON.stringify({ numsession }),
       })
       const data = await res.json().catch(() => ({}))
